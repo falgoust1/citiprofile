@@ -1,34 +1,77 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>DeckGL Grid</title>
-  
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Démonstrateur - Citiprofile</title>
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="interface.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        #header {
+            background: #00335a;
+            color: white;
+            text-align: left;
+            font-family: "Gill Sans", sans-serif;
+            padding: 10px; /*taille du bandeau */ 
+            font-size: 30px; /*taille de la police */
+            padding-top: -20px; 
+        }
+        #header img {
+            height: 100%;
+            margin-right: 12000px;
+        }
+        #map {
+            flex-grow: 1;
+        }
+    </style>
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<html>
-  <head>
-    <!-- deck.gl standalone bundle -->
-<script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
 
-<script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
-<link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <!--Configurer le titre et bandeau du démonstrateur--> 
+    <div id="header">
+        <div id="header">
+            <span class="green-text bold-text">Rennes</span> <span class="white-text italic-text">| Quartier Villejean</span> <button type="button" id="accueil">Réinitialiser</button><!--bold-text est défini dans le CSS--> 
+        </div>        
+    </div> 
+    <div id="map"></div>
 
-    <style type="text/css">
-      body {margin: 0; padding: 0;}
-      #container {width: 100vw; height: 100vh;}
-    </style>
-  </head>
+        <!--Configurer le menu pour les fonds de carte--> 
+        <div id="menu">
+            <label for="style-selector" class="white-text"><strong>Choix du fond de carte</strong>    </label>
+            <select id="style-selector">
+                <option class="green-text" value="https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json">Light </option>
+                <option class="green-text" value="https://openmaptiles.geo.data.gouv.fr/styles/dark-matter/style.json">Dark</option>
+            </select>
+        </div>
 
-  <body>
-    <div id="container"></div>
-  </body>
+        <!--Configurer le menu pour les types de cartes--> 
 
-</html>
-<!-- partial -->
-  <script  src="./script.js"></script>
+        <div id="menu3">
+            <label class="white-text"><strong>Choix du type de cartes</strong></label>
+            <div id="style-selector">
+                <label class="radio-option">
+                    <input type="radio" name="map-type" value="heatmap"> Heatmap
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="map-type" value="scatterplot"> Scatterplot
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="map-type" value="3D"> Carte en 3D
+                </label>
+            </div>
+        </div>
+        
 
+    <!-- Lien vers fichier JavaScript -->
+    <script src="visuel.js"></script>
 </body>
 </html>

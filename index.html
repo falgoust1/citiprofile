@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DeckGL / Scatter</title>
+  <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+
+  <div id="container">
+    <div id="sidebar">
+    <!-- Contrôles pour la sélection des couches -->
+        <div id="layer-controls">
+          <h3> Sélectionner une couche</h3>
+            <label>
+              <input type="radio" name="layer" id="radio-scatter"> Afficher Scatterplot
+            </label>
+            <label>
+              <input type="radio" name="layer" id="radio-grid" checked> Afficher Grid
+            </label>
+            <label>
+              <input type="radio" name="layer" id="radio-heat"> Afficher Heatmap
+            </label>
+            <label>
+              <input type="radio" name="layer" id="radio-hex"> Afficher Hexbin 3D
+            </label>
+            <label>
+              <input type="radio" name="layer" id="radio-screen"> Afficher Screen
+            </label>
+        </div>
+    </div>
+
+    <!-- Le Canvas de DeckGL -->
+    <div id="deck-canvas"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

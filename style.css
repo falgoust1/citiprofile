@@ -1,0 +1,50 @@
+body {margin: 0; padding: 0;}
+#container {width: 100vw; height: 100vh;}
+
+/* Conteneur pour les contrôles */
+#layer-controls {
+      position: absolute;
+      height: 100%;
+      width: 20%;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: #0c284c;
+      color: #E8E6E3;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border-radius: 8px;
+    }
+
+
+
+
+  /* Réinitialisation du margin et padding */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Le body prend toute la taille de la fenêtre sans marge */
+    body, html {
+      height: 100%;
+    }
+
+    #container {
+      position: absolute; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
+      width: 100%;
+      height: 100%;
+    }
+
+    #deck-canvas {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+

@@ -1,0 +1,108 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#header {
+  background: #00335a;
+  color: white;
+  text-align: left;
+  font-family: "Gill Sans", sans-serif;
+  padding: 10px; /*taille du bandeau */ 
+  font-size: 30px; /*taille de la police */
+  padding-top: -20px; 
+}
+#header img {
+  height: 100%;
+  margin-right: 12000px;
+}
+#map {
+  flex-grow: 1;
+}
+
+/* Logo dans le titre */ 
+#header img {
+    max-height: 50px; /*taille du logo (bouge la taille du bandeau aussi) */ 
+    transform: translateY(-5px); /*permet de modifier la hauteur du logo*/ 
+}
+
+
+/* couleurs titre démonstrateur */ 
+.green-text {
+    color: #25d366;  /* Le mot "Rennes" sera en vert */
+    font-weight: bold;
+}
+
+.white-text {
+    color: white;  /* Le texte "| Quartier Villejean" sera en blanc */
+    font-family: "Gill Sans", sans-serif; 
+}
+
+/* mettre la police en gras + pour mettre en itlaique ajouter une balise <em> autour du texte qu'on veut mettre en italique*/ 
+
+.bold-text {
+    font-weight: bold;
+}
+
+/* bouton accueil */
+
+#accueil {
+    background-color: #25d366; /* Choisir une couleur pour le bouton */
+    color: white;
+    padding: 5px 10px;
+    font-family: "Gill Sans", sans-serif; 
+    margin-right: 100%;
+    border: none;
+    border: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#accueil:hover {
+    background-color: #199b43; /* Couleur du bouton au survol */
+}
+
+
+/*changements de fonds de carte */
+
+#menu {
+    position: absolute;
+    top: 118px;
+    left: 5px;
+    background: #00335a;
+    padding: 8px; /* taille de la fenêtre de choix */ 
+    z-index: 1000;
+    border-radius: 5px;
+    box-shadow: 0 0 10px black;
+}
+
+/* modifier la police du "label" */ 
+
+label.white-text {
+    color: white;
+    font-family: "Gill Sans", sans-serif; 
+}
+
+/*menu changements de type de cartes */
+
+#menu3 {
+    position: absolute;
+    bottom: 80px;
+    left: 5px;
+    background: #00335a;
+    font-family: "Gill Sans", sans-serif;
+    padding: 15px;  
+    z-index: 1000;
+    border-radius: 15px;
+    box-shadow: 0 0 20px black;
+    color: white;
+   
+}
+
+#menu3 label { /*mettre "label" permet de changer uniquement un élément du menu et pas toute la sélection*/
+    display: block; 
+    margin-bottom: 15px; 
+}

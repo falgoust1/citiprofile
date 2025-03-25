@@ -1,52 +1,79 @@
-console.log("deck.gl chargé :", deck);
+// Configuration de la carte avec MapLibre
+var map = new maplibregl.Map({
+    container: 'map',  
+    style: 'https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json',  
+    center: [-1.6658424068410043, 48.12729238983067],  
+    zoom: 11.5,  
+    pitch: 0,   
+    bearing: 0, 
+    attributionControl: false  // mettre true = avoir une source automatique
+});
 
-// Vérification que `deck` est bien défini avant d’accéder à ses propriétés
-if (typeof deck !== "undefined") {
-  const DeckGL = deck.DeckGL;
-  const GeoJsonLayer = deck.GeoJsonLayer;
+//chargement des couches
+map.on('load', function () {
+    addLayers(); // Fonction pour ajouter les couches
+});
+
+// changement de fond de carte
+document.getElementById('style-selector').addEventListener('change', function () {
+    map.setStyle(this.value);  
+
+    // Attendre que le style soit chargé avant de rajouter les couches
+    map.once('styledata', function () {
+        addLayers(); // Fonction pour réajouter les couches
+    });
+});
   
+  // Ajout Echelle cartographique
+  map.addControl(new maplibregl.ScaleControl({
+      maxWidth: 120,
+      unit: 'metric'
+  }));
+  
+  // Boutons de navigation 
+  var nav = new maplibregl.NavigationControl();
+  map.addControl(nav, 'top-right');
+  
+  //Ajout crédit source
+  map.addControl(new maplibregl.AttributionControl({
+    customAttribution: '© <a href="https://esigat.wordpress.com/" target="_blank">Master SIGAT</a> | © <a href="https://www.citiprofile.com" target="_blank">Citiprofile</a>'
+}));
 
-// Pour faire tourner le script avec les données en local :
-  //Lancer un environnement python depuis le terminal de ce dossier :
-    //1 - Télécharger les scripts depuis github et les mettre dans un même dossier
-    //2 - Les ouvrirs dans VScode en ouvrant le dossier les contenant
-    //3 - Ajouter les données que l'on veut (au format geojson) au dossier
-    //4 - Ouvrir le terminal VScode
-    //5 - Lancer un environnement python avec la commande : python -m http.server 8000
+/*Ajout de la couche des quartiers de rennes*/
+/* mettre le remplissage que lorsque la souris passe sur le quartier */
 
 
-  fetch('http://localhost:8000/ZN_bat_60-61_w_IDs.geojson') //Renseigner son http localhost
-    .then((response) => response.json())
-    .then((geojson) => {
-      console.log("Données chargées :", geojson); // Vérification dans la console
+function addLayers() {
+    map.addSource('geojson-layer', {
+        type: 'geojson',
+        data: 'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/perimetres-des-12-quartiers-de-la-ville-de-rennes/exports/geojson?lang=fr&timezone=Europe%2FBerlin'
+    });
 
-      const layer = new GeoJsonLayer({
-        id: 'geojson-layer',
-        data: geojson, // Utilisation directe du GeoJSON
-        pickable: true,
-        stroked: false,
-        filled: true,
-        extruded: false,
-        pointType: "circle",
-        getFillColor: [255, 140, 0, 180], // Orange semi-transparent
-        getRadius: 5, // Taille des points
-      });
+    map.addLayer({
+        id: 'geojson-layer-line',
+        type: 'line',
+        source: 'geojson-layer',
+        paint: {
+            'line-color': '#25d366',
+            'line-width': 1
+        }
+    });
 
-      new DeckGL({
-        mapStyle: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-        initialViewState: {
-          longitude: -1.6992, // Ajuste selon tes données
-          latitude: 48.1119,
-          zoom: 13,
-          pitch: 0,
-          bearing: 0,
-        },
-        controller: true,
-        getTooltip: ({ object }) => object && `ID: ${object.properties.ID}`,
-        layers: [layer],
-      });
-    })
-    .catch((error) => console.error('Erreur de chargement du GeoJSON:', error));
-} else {
-  console.error("deck.gl n'est pas chargé correctement !");
+    map.addLayer({
+        id: 'geojson-layer-fill',
+        type: 'fill',
+        source: 'geojson-layer',
+        paint: {
+            'fill-color': '#ffffff',
+            'fill-opacity': 0.1
+        }
+    });
 }
+
+//pour changement de titre
+ map.on('click', 'geojson-layer-fill', function (e) {
+        if (e.features.length > 0) {
+            let quartierNom = e.features[0].properties.nom; // Récupération du nom du quartier
+            document.querySelector("#quartier-nom").textContent = `| Quartier ${quartierNom}`; // Mise à jour du header
+        }
+    });

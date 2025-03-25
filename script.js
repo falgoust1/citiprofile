@@ -1,7 +1,7 @@
 
 
 
-const { DeckGL, ScatterplotLayer, GridLayer, HeatmapLayer, HexagonLayer, ScreenGridLayer } = deck;
+const { DeckGL, ScatterplotLayer, GridLayer, HeatmapLayer, HexagonLayer, ScreenGridLayer, DataFilterExtension } = deck;
 
 
 
@@ -60,6 +60,8 @@ fetch("http://127.0.0.1:5500/ZN_63_IDs.geojson")
         bearing: 0
       },
       controller: true,
+      getTooltip: ({object}) =>
+        object && `Nombre de points : ${object.points.length}`,
       layers: [] // Pas de couche initiale, on va l'ajouter après
     });
 
@@ -115,7 +117,7 @@ fetch("http://127.0.0.1:5500/ZN_63_IDs.geojson")
           id: "ScreenGridLayer",
           data: points,
           opacity: 0.8,
-          cellSizePixels: 30,
+          cellSizePixels: 20,
           colorRange: [
             [255, 255, 178, 25],
             [254, 217, 118, 85],
@@ -160,6 +162,7 @@ fetch("http://127.0.0.1:5500/ZN_63_IDs.geojson")
             [254, 173, 84],
             [209, 55, 78]
           ]
+          
         });
       }
 

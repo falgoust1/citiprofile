@@ -1,0 +1,203 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#header {
+  background: #00335a;
+  color: white;
+  text-align: left;
+  font-family: "Gill Sans", sans-serif;
+  padding: 10px; /*taille du bandeau */ 
+  font-size: 30px; /*taille de la police */
+  padding-top: -20px; 
+}
+#header img {
+  height: 100%;
+  margin-right: 12000px;
+}
+#map {
+  flex-grow: 1;
+}
+
+/* Logo dans le titre */ 
+#header img {
+    max-height: 50px; /*taille du logo (bouge la taille du bandeau aussi) */ 
+    transform: translateY(-5px); /*permet de modifier la hauteur du logo*/ 
+}
+
+
+/* couleurs titre démonstrateur */ 
+.green-text {
+    color: #25d366;  /* Le mot "Rennes" sera en vert */
+    font-weight: bold;
+}
+
+.white-text {
+    color: white;  /* Le texte "| Quartier Villejean" sera en blanc */
+    font-family: "Gill Sans", sans-serif; 
+}
+
+/* mettre la police en gras + pour mettre en itlaique ajouter une balise <em> autour du texte qu'on veut mettre en italique*/ 
+
+.bold-text {
+    font-weight: bold;
+}
+
+/* bouton accueil */
+
+#accueil {
+    background-color: #25d366; /* Choisir une couleur pour le bouton */
+    color: white;
+    padding: 5px 10px;
+    font-family: "Gill Sans", sans-serif; 
+    margin-right: 100%;
+    border: none;
+    border: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#accueil:hover {
+    background-color: #199b43; /* Couleur du bouton au survol */
+}
+
+
+/*changements de fonds de carte */
+
+#menu {
+    position: absolute;
+    top: 105px;
+    left: 260px;
+    background: #00335a;
+    padding: 8px; 
+    z-index: 1000;
+    border-radius: 5px;
+    box-shadow: 0 0 10px black;
+}
+
+/* modifier la police du "label" */ 
+
+label.white-text {
+    color: white;
+    font-family: "Gill Sans", sans-serif; 
+}
+
+/* CSS relatif au toggle slider pour le changement de fond de carte */ 
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: white;
+    margin-left: 20px; 
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2b2b2b;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+
+/* Menu latéral pour changer de type de cartes */
+
+#menu3 {
+    position: fixed;
+    left: 0;
+    top: 89px;
+    width: 220px; /* Largeur de la colonne */
+    height: calc(100vh - 60px); /* Hauteur ajustée à la taille de l'écran */
+    background: #00335a; 
+    opacity: 0.9;
+    font-family: "Gill Sans", sans-serif;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 2px 0 10px black; /* Ombre */
+    color: white;
+    border-radius: 0; /* Suppression du border-radius pour un effet colonne */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+/* Style du titre */
+#menu3 label.white-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* Conteneur des options */
+#style-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Style des options radio */
+.radio-option {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+.radio-option:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Style des inputs radio */
+.radio-option input {
+    margin-right: 10px;
+}

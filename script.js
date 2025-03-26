@@ -160,7 +160,9 @@ fetch("http://127.0.0.1:5500/ZN_bat_60-61_w_IDs.geojson")
       } else if (polySelected) {
         newLayer = new GeoJsonLayer({
           id: 'GeoJsonLayer',
-          data: 'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/batis_compte.geojson',
+          /* Appel du geojson prétraité sur qgis du nombre de point compté par bâtiments*/
+
+          data: 'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/bat6061s.geojson',
           getPolygon: d => d.geometry.coordinates,
           filled: true,
           getLineColor: [80, 80, 80],

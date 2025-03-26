@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DeckGL / Scatter</title>
+  <title>DeckGL / Citiprofile</title>
   <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" /> 
@@ -11,10 +11,23 @@
 </head>
 <body>
 
+  
+
+
+
+
   <div id="container">
+
+ 
+
+
+
+
+
+
     <!-- Contrôles pour la sélection des couches -->
     <div id="layer-controls">
-      <h3></h3>
+      
       <label class="label">
         <input type="radio" name="layer" id="radio-scatter"> Scatterplot
       </label>
@@ -32,9 +45,36 @@
       </label>
     </div>
 
+
     <!-- Le Canvas de DeckGL -->
     <div id="deck-canvas"></div>
+
+
+    
   </div>
+
+
+
+
+     <!--Configurer le titre et bandeau du démonstrateur--> 
+     <div id="header">
+      <div id="header-left">
+        <span class="bold-text">Rennes</span> 
+        <button type="button" id="accueil">Réinitialiser</button>
+        <span class="white-text italic-text" id="quartier-nom"></span>
+      </div>
+    
+      <div id="header-right">
+        <label class="toggle-switch">
+          <input type="checkbox" id="map-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  
+ 
+
+
 
   <script src="./script.js"></script>
 </body>

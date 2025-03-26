@@ -56,7 +56,7 @@ let currentViewState = {
     // Création de l'instance DeckGL après chargement des données
     const deckgl = new DeckGL({
       container: "deck-canvas", // ID du conteneur HTML
-      mapStyle: "https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json", //Ajout du fond de carte
+      mapStyle: "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json", //Ajout du fond de carte
       controller: true,
       viewState: currentViewState,
       onViewStateChange: ({ viewState }) => {
@@ -67,6 +67,52 @@ let currentViewState = {
         object && `Nombre de points : ${object.points.length}`,
       layers: [] // Pas de couche initial, on va l'ajouter apres
     });
+
+
+
+
+
+
+
+
+
+
+//                 Partie pour le switch Clair / Foncé
+
+// Sélectionner le toggle switch
+const toggle = document.getElementById("map-toggle");
+
+
+// Écoute l’événement "change"
+toggle.addEventListener('change', (e) => {
+  if (e.target.checked) {
+    // Case cochée => style sombre
+    deckgl.setProps({
+      mapStyle: 'https://openmaptiles.geo.data.gouv.fr/styles/dark-matter/style.json' 
+    });
+  } else {
+    // Case décochée => style clair
+    deckgl.setProps({
+      mapStyle: 'https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json'
+    });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Fonction pour recréer la couche sélectionnée
     function updateLayer() {
@@ -118,7 +164,7 @@ let currentViewState = {
           colorAggregation: "SUM",
           colorScaleType: "quantile",
           opacity: 1,
-          pickable: true,
+          pickable: false,
           colorRange: [
             [1, 152, 189],
             [73, 227, 206],
@@ -149,7 +195,7 @@ let currentViewState = {
           colorAggregation: "SUM",
           colorScaleType: "quantile",
           opacity: 0.8,
-          pickable: true,
+          pickable: false,
           colorRange: [
             [1, 152, 189],
             [73, 227, 206],
@@ -163,7 +209,7 @@ let currentViewState = {
           newLayer = new ScreenGridLayer({
             id: 'ScreenGridLayer',
             data: points,
-            opacity: 0.8,
+            opacity: 0.5,
             cellSizePixels: 20,
             colorRange: [
               [1, 152, 189],
@@ -177,9 +223,49 @@ let currentViewState = {
           });
         }
 
+
+
+
+
+
+        // Exemple de couche GeoJsonLayer pour dessiner les quartiers de Rennes
+        const quartiersLayer = new deck.GeoJsonLayer({
+          id: 'quartiers-layer',
+          data: 'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/perimetres-des-12-quartiers-de-la-ville-de-rennes/exports/geojson?lang=fr&timezone=Europe%2FBerlin',
+          
+          /* Options de style */
+          stroked: true,                  // on dessine la bordure
+          filled: true,                   // on autorise un remplissage
+          getLineColor: [37, 211, 102],   // #25d366 => en [R, G, B]
+          lineWidthMinPixels: 2,
+          
+          /* Couleurs de remplissage par défaut = transparent */
+          getFillColor: [0, 0, 0, 0],     // invisible quand pas survolé
+          
+          /* Interactions */
+          pickable: false,         // rend la couche "cliquable/hoverable"
+          autoHighlight: false,    // active un effet de survol automatique
+          highlightColor: [255, 255, 255, 40], // couleur survol: blanc semi-transparent
+          
+          /* Clic sur le quartier => mise à jour du #quartier-nom */
+          onClick: info => {
+            if (info.object) {
+              const nomQuartier = info.object.properties.nom;
+              document.querySelector('#quartier-nom').textContent = `| Quartier ${nomQuartier}`;
+            }
+          }
+        });
+        
+
+
+
+
+
       // Mise à jour de la carte avec la nouvelle couche
       deckgl.setProps({ 
-        layers: [newLayer],
+        layers: [newLayer,
+          quartiersLayer
+        ],
         viewState: updatedViewState //Passer du pitch 50 au 0 en fct de la couche
       });
       

@@ -1,21 +1,41 @@
-<html>
-  <head>
-    <!-- deck.gl standalone bundle -->
-<script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DeckGL / Scatter</title>
+  <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" /> 
+  <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
 
-<script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
-<link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <div id="container">
+    <!-- Contrôles pour la sélection des couches -->
+    <div id="layer-controls">
+      <h3></h3>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-scatter"> Scatterplot
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-grid" checked> GridExtrude
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-heat"> Heatmap
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-hex"> Hexbin 3D
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-screen"> ScreenGrid
+      </label>
+    </div>
 
-    <style type="text/css">
-      body {margin: 0; padding: 0;}
-      #container {width: 100vw; height: 100vh;}
-    </style>
-  </head>
+    <!-- Le Canvas de DeckGL -->
+    <div id="deck-canvas"></div>
+  </div>
 
-  <body>
-    <div id="container"></div>
-    <script  src="./script.js"></script>
-
-  </body>
-
+  <script src="./script.js"></script>
+</body>
 </html>

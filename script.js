@@ -1,12 +1,15 @@
+//Appel des fonctions utiles pour aggréger les données 
+
 const { DeckGL, ScatterplotLayer, ScreenGridLayer, GridLayer, HeatmapLayer, HexagonLayer, DataFilterExtension, GeoJsonLayer } = deck;
 
 let sliderValue = 1000; // Valeur du filtre par défaut
 
-// Charger le fichier JSON localement
+// Charger le fichier JSON localement (celui des points)
 fetch("http://127.0.0.1:5500/ZN_bat_60-61_w_IDs.geojson")
   .then(response => response.json())
   .then((geojson) => {
 
+//Création d'une constante (ou variable), permettant de reconfigurer notre couche avec des coordonnées propres
     const points = [];
 
     for (const feature of geojson.features) {
@@ -23,14 +26,16 @@ fetch("http://127.0.0.1:5500/ZN_bat_60-61_w_IDs.geojson")
       }
     }
 
+// Paramètre d'affichage de la vue 
     let currentViewState = {
       longitude: -1.6992,
       latitude: 48.1119,
       zoom: 14,
-      pitch: 50,
+      pitch: 40,
       bearing: 0
     };
 
+//Paramètrage et choix du fond de carte 
     const deckgl = new DeckGL({
       container: "deck-canvas",
       mapStyle: "https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json",
@@ -40,10 +45,41 @@ fetch("http://127.0.0.1:5500/ZN_bat_60-61_w_IDs.geojson")
         currentViewState = viewState;
         deckgl.setProps({ viewState });
       },
-      getTooltip: ({ object }) =>
-        object && object.properties && object.properties.nbpoints !== undefined
-          ? `Nombre de points : ${object.properties.nbpoints}`
-          : null,
+
+      
+// Paramètrage pour voir le nombre de points sur les entités de chaque couche 
+getTooltip: ({ object }) => {
+  if (!object) return null;
+
+  // Cas GeoJsonLayer (bâtiments)
+  if (object.properties && object.properties.nbpoints !== undefined) {
+    return {
+      html: `<b>Bâtiment</b><br>Nombre de points : ${object.properties.nbpoints}`,
+      style: {
+        backgroundColor: "#333",
+        color: "#fff",
+        fontSize: "0.9em",
+        padding: "6px"
+      }
+    };
+  }
+
+  // Cas GridLayer ou HexagonLayer (agrégations)
+  if (object.count !== undefined) {
+    return {
+      html: `<b>Agrégation</b><br>Nombre de points : ${object.count}`,
+      style: {
+        backgroundColor: "#2a2a2a",
+        color: "#eee",
+        fontSize: "0.9em",
+        padding: "6px"
+      }
+    };
+  }
+
+  return null;
+},
+
       layers: []
     });
 
@@ -160,7 +196,7 @@ fetch("http://127.0.0.1:5500/ZN_bat_60-61_w_IDs.geojson")
       } else if (polySelected) {
         newLayer = new GeoJsonLayer({
           id: 'GeoJsonLayer',
-          /* Appel du geojson prétraité sur qgis du nombre de point compté par bâtiments*/
+          /* Appel du geojson prétraité sur qgis du nombre de point compté par bâtiments, attention à bien changer la source*/
 
           data: 'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/bat6061s.geojson',
           getPolygon: d => d.geometry.coordinates,
@@ -174,11 +210,13 @@ fetch("http://127.0.0.1:5500/ZN_bat_60-61_w_IDs.geojson")
           wireframe: false,
           extrusionbase: 0,
           elevationScale: 1,
+          pickable: true,
+          getElevationBase: d => 0,
           getElevation: d => d.properties.HAUTEUR,
           getFillColor: d =>
-            d.properties.nbpoints < 7 ? [1, 152, 189] :
-            d.properties.nbpoints < 39 ? [216, 254, 181] :
-            d.properties.nbpoints < 672 ? [209, 55, 78] :
+            d.properties.nbpoints < 10 ? [1, 152, 189] :
+            d.properties.nbpoints < 40 ? [216, 254, 181] :
+            d.properties.nbpoints < 450 ? [209, 55, 78] :
             [209, 55, 78],
 
           // ✅ Filtrage dynamique par nbpoints

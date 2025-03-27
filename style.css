@@ -18,11 +18,11 @@ body {margin: 0; padding: 0;}
                         
                         #layer-controls * {
                               box-sizing: border-box;
-                              background-color: #01335A;
+                              background-color: #212C35;
                               border-radius: 8px;
                               z-index: 2000;
                               opacity: 0.8;
-                              left: 20px;
+                              left: 40px;
                               top: 150px;
                               padding: 0;
                               margin: 0;
@@ -60,7 +60,7 @@ body {margin: 0; padding: 0;}
                         }
                         
                         #layer-controls .label:has(input:checked)::before {
-                              background-color: #24D366;
+                              background-color: #124E66;
                               border-color: #435dd8;
                               height: 50px;
                               
@@ -153,13 +153,15 @@ body {margin: 0; padding: 0;}
 
 #header {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 15px;
+      left: 40px;
+      right: 40px;
+      border-radius: 8px;
       gap: 15px;
-      height: 10%;     /* ou la hauteur que tu souhaites */
+      height: 8%;     /* ou la hauteur que tu souhaites */
       z-index: 1001;    /* pour passer au-dessus de la carte */
-      background: #00335a;
+      background: #323B42;
+      opacity: 0.9;
       color: white;
       display: flex;
       align-items: center;
@@ -205,10 +207,11 @@ body {margin: 0; padding: 0;}
 
 
     #accueil {
-      background-color: #25d366; /* Choisir une couleur pour le bouton */
+      background-color: #124E66; /* Choisir une couleur pour le bouton */
       color: white;
       padding: 5px 10px;
       font-family: Poppins; 
+      font-size: 18px;
       margin-right: 100%;
       border: none;
       border: white;

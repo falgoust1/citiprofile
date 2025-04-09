@@ -1,68 +1,77 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>citiprofile</title>
-  <link rel="stylesheet" href="./style.css">
-
+  <title>DeckGL / Citiprofile</title>
+  <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" /> 
+  <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Démonstrateur - Citiprofile</title>
-    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
-    <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" href="interface.css">
-</head>
-<body>
+  <div id="container">
 
-    <!--Configurer le titre et bandeau du démonstrateur--> 
-   <div id="header">
-    <span class="green-text bold-text">Rennes</span> 
-    <span class="white-text italic-text" id="quartier-nom"></span> 
-    <button type="button" id="accueil">Réinitialiser</button>
-</div>
-  
-    <div id="map"></div>
+    <!-- Contrôles pour la sélection des couches -->
+    <div id="layer-controls">
+      
+      <label class="label">
+        <input type="radio" name="layer" id="radio-scatter" checked> Scatterplot
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-grid" > GridExtrude
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-heat"> Heatmap
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-hex"> Hexbin 3D
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-screen"> ScreenGrid
+      </label>
+      <label class="label">
+        <input type="radio" name="layer" id="radio-poly"> Bâtiments en 3D
+      </label>
+      <div id="slider-container">
+        <h3> Maximum de points par bâtiment :</h3>
+        <div class="slider-wrapper">
+          <input type="range" id="point-slider" min="0" max="200" value="200">
+          <span id="slider-value">200</span>
+        </div>
+      </div>
 
-<!-- Configurer le menu des fonds de carte avec un Toggle -->
-<div id="menu" class="toggle-container">
-    <span>Light</span>
-    <label class="toggle-switch">
-        <input type="checkbox" id="map-toggle">
-        <span class="slider"></span>
-    </label>
-    <span>Dark</span>
-</div>
-
-<!--Configurer le menu pour les types de cartes--> 
-
-<div id="menu3">
-    <label class="white-text"><strong>Choix du type de cartes</strong></label>
-    <div id="style-selector">
-        <label class="radio-option">
-            <input type="radio" name="map-type" value="heatmap"> Heatmap
-        </label>
-        <label class="radio-option">
-            <input type="radio" name="map-type" value="scatterplot"> Scatterplot
-        </label>
-        <label class="radio-option">
-            <input type="radio" name="map-type" value="3D"> Carte en 3D
-        </label>
     </div>
-</div>
-        
 
-    <!-- Lien vers fichier JavaScript -->
-    <script src="visuel.js"></script>
-</body>
-</html>
-<!-- partial -->
-  <script  src="./script.js"></script>
+    <!-- Le Canvas de DeckGL -->
+    <div id="deck-canvas"></div>
+    
+  </div>
 
+
+
+
+     <!--Configurer le titre et bandeau du démonstrateur--> 
+     <div id="header">
+      <div id="header-left">
+        <span class="bold-text">Rennes</span> 
+        <button type="button" id="accueil">Réinitialiser</button>
+        <span class="white-text italic-text" id="quartier-nom"></span>
+      </div>
+    
+      <div id="header-right">
+        <label class="toggle-switch">
+          <input type="checkbox" id="map-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  
+ 
+
+
+
+  <script src="./script.js"></script>
 </body>
 </html>

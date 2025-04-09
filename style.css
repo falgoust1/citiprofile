@@ -311,17 +311,19 @@ body {margin: 0; padding: 0;}
 
 
 
-  #slider-container {
-      display: flex;
-      flex-direction: column;
-      padding: 0 20px;
-      margin-top: 10px;
-      gap: 8px;
-      width: 220px;
-      font-family: Poppins;
-      font-size: 14px;
-      color: white;
-    }
+ #slider-container {
+  margin-top: 150px; /* Un peu plus d'espace entre les contrôles radio et le slider */
+  margin-left: 40px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 220px;
+  font-family: Poppins;
+  font-size: 14px;
+  color: white;
+  
+}
     
     .slider-label {
       font-weight: 500;

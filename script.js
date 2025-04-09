@@ -258,7 +258,7 @@ toggle.addEventListener('change', (e) => {
             id: 'GeoJsonLayer',
             /* Appel du geojson prétraité sur qgis du nombre de point compté par bâtiments, attention à bien changer la source*/
   
-            data: 'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/bat6061s.geojson',
+            data: 'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/bat6061s2.geojson',
             getPolygon: d => d.geometry.coordinates,
             filled: true,
             getLineColor: [80, 80, 80],

@@ -162,13 +162,13 @@ body {margin: 0; padding: 0;}
       z-index: 1001;    /* pour passer au-dessus de la carte */
       background: #323B42;
       opacity: 0.9;
-      color: white;
+      color: rgb(255, 255, 255);
       display: flex;
       align-items: center;
       padding: 10px;
       font-family: Poppins;
       font-weight: bold;
-      font-size: 20px;
+      font-size: 30px;
       justify-content: space-between;/* espace entre le bloc de gauche et celui de droite */
 
     }
@@ -205,6 +205,10 @@ body {margin: 0; padding: 0;}
       margin-right: 12000px;
     }
 
+  #quartier-nom{
+      font-family: Poppins; 
+      font-size: 20px;
+  }
 
     #accueil {
       background-color: #124E66; /* Choisir une couleur pour le bouton */
@@ -212,17 +216,12 @@ body {margin: 0; padding: 0;}
       padding: 5px 10px;
       font-family: Poppins; 
       font-size: 18px;
-      margin-right: 100%;
       border: none;
       border: white;
       border-radius: 5px;
       cursor: pointer;
   }
 
-  #quartier-nom{
-      font-family: Poppins; 
-      font-size: 10px;
-  }
 
   #accueil:hover {
       background-color: #199b43; /* Couleur du bouton au survol */
@@ -315,7 +314,8 @@ body {margin: 0; padding: 0;}
       display: flex;
       flex-direction: column;
       padding: 0 20px;
-      margin-top: 10px;
+      margin-top: 132px;
+      margin-left: 40px;
       gap: 8px;
       width: 220px;
       font-family: Poppins;
@@ -349,10 +349,10 @@ body {margin: 0; padding: 0;}
     
     
     #slider-container h3 {
-      margin: 8px 0 4px 0; /* top, right, bottom, left */
+      margin: 8px 0 4px 4px; /* top, right, bottom, left */
       font-size: 14px;
       
       font-weight: 500;
-      color: white;
+      color: rgb(255, 255, 255);
       font-family: Poppins;
     }

@@ -16,6 +16,7 @@ const {
 let isSplit = false;
 let mirrorEnabled = false;
 let globalGeo = null;
+let syncingView  = false;
 const instances = {};
 
 // Default initial state for single view
@@ -118,6 +119,19 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
     viewState: state.viewState,
     onViewStateChange: ({viewState})=>{
       state.viewState = viewState;
+       /* ---- synchronisation miroir ---- */
+    if (isSplit && mirrorEnabled && !syncingView) {
+      const other = container.includes("left") ? "right"
+                  : container.includes("right") ? "left"
+                  : null;
+
+      if (other && instances[other]) {
+        syncingView = true;                  // on inhibe le callback de l’autre carte
+        instances[other].deckgl.setProps({ viewState });
+        instances[other].state.viewState = viewState;
+        syncingView = false;
+      }
+    }
       deckgl.setProps({ viewState });
     },
     layers:[]

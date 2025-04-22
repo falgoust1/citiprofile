@@ -92,7 +92,7 @@ body, html {
 #chart-panel-right {
   position: absolute;
   bottom: 20px;
-  left: 20px;
+  left: 300px;
   z-index: 1000;
   width: 200px;
   height: 200px;
@@ -126,15 +126,20 @@ body, html {
 
 /* OVERRIDE: .layer-controls & .slider-container styling */
 .layer-controls {
-  background: rgba(33, 44, 53, 0.8);
-  border-radius: 8px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  font-size: 16px;
-  color: #fff;
-  gap: 20px;
-}
+      position: absolute;
+      top: 20px;        /* ou 50px si vous voulez partir sous le header */
+      left: 20px;
+      bottom: 20px;     /* étire jusqu’à 20px du bas de l’écran */
+      width: 240px;     /* ou la largeur que vous souhaitez */
+      background: rgba(38, 41, 44, 0.95);
+      border: 1px solid #435dd8;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      border-radius: 8px;
+      padding: 10px;
+      overflow-y: auto; /* scroll si trop long */
+      z-index: 1000;
+      color: #ffffffff
+    }
 
 .layer-controls label {
   display: flex;
@@ -171,7 +176,7 @@ body, html {
 }
 
 .layer-controls input[type="radio"] {
-  background-color: #202030;
+  background-color: #afafb3;
   appearance: none;
   width: 17px;
   height: 17px;
@@ -183,7 +188,7 @@ body, html {
 }
 
 .layer-controls input[type="radio"]:checked {
-  background-color: #435dd8;
+  background-color: #858585;
   animation: pulse 0.7s forwards;
 }
 

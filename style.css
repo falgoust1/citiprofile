@@ -8,6 +8,19 @@ body, html {
   font-family: 'Poppins', sans-serif;
 }
 
+#container {
+  position: absolute;
+  top: 50px; /* espace sous le header */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: calc(100vh - 50px);
+}
+
+/* HEADER */
 #header {
   position: fixed;
   top: 0;
@@ -38,19 +51,9 @@ body, html {
   color: white;
 }
 
-#container {
-  position: absolute;
-  top: 50px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-  height: calc(100vh - 50px);
-}
-
-#single-view, #split-view {
+/* SINGLE VIEW & SPLIT VIEW CONTAINERS */
+#single-view,
+#split-view {
   position: absolute;
   top: 0;
   left: 0;
@@ -65,18 +68,28 @@ body, html {
 .panel {
   width: 50%;
   position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-.deck-canvas {
+/* DECK CANVAS */
+#deck-canvas-single,
+#canvas-left,
+#canvas-right {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.chart-panel {
+/* CHART PANEL */
+#chart-panel-single,
+#chart-panel-left,
+#chart-panel-right {
   position: absolute;
   bottom: 20px;
   left: 20px;
@@ -85,24 +98,42 @@ body, html {
   height: 200px;
 }
 
-/* Controls styling for single and split */
-.layer-controls {
-  display: flex;
-  flex-direction: column;
-  font-size: 16px;
-  color: #fff;
-  gap: 20px;
-  margin-top: 20px;
+/* Controls Panels Positioning */
+#layer-controls-single,
+#controls-left {
   position: absolute;
   top: 20px;
   left: 20px;
   z-index: 1000;
 }
 
-.layer-controls * {
-  box-sizing: border-box;
-  padding: 0;
-  margin-left: 25px;
+#controls-right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* TOOLTIP */
+.deck-tooltip {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.9em;
+  background-color: #333 !important;
+  color: #fff !important;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+/* OVERRIDE: .layer-controls & .slider-container styling */
+.layer-controls {
+  background: rgba(33, 44, 53, 0.8);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  color: #fff;
+  gap: 20px;
 }
 
 .layer-controls label {
@@ -117,30 +148,29 @@ body, html {
 }
 
 .layer-controls label::before {
-  position: absolute;
   content: "";
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 220px;
   height: 45px;
   z-index: -1;
-  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   border-radius: 10px;
   border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .layer-controls label:hover::before {
   background-color: #2a2e3c;
 }
 
-.layer-controls .label:has(input:checked)::before {
+.layer-controls label:has(input:checked)::before {
   background-color: #2d3750;
   border-color: #435dd8;
-  height: 50px;
 }
 
-.layer-controls .label input[type="radio"] {
+.layer-controls input[type="radio"] {
   background-color: #202030;
   appearance: none;
   width: 17px;
@@ -149,15 +179,15 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  position: relative;
 }
 
-.layer-controls .label input[type="radio"]:checked {
+.layer-controls input[type="radio"]:checked {
   background-color: #435dd8;
   animation: pulse 0.7s forwards;
 }
 
-.layer-controls .label input[type="radio"]::before {
+.layer-controls input[type="radio"]::before {
   content: "";
   width: 6px;
   height: 6px;
@@ -165,9 +195,10 @@ body, html {
   background-color: #fff;
   transform: scale(0);
   transition: transform 0.1s ease;
+  position: absolute;
 }
 
-.layer-controls .label input[type="radio"]:checked::before {
+.layer-controls input[type="radio"]:checked::before {
   transform: scale(1);
 }
 
@@ -177,16 +208,22 @@ body, html {
   100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
 }
 
-/* Slider container styling */
 .slider-container {
+  background: rgba(33, 44, 53, 0.8);
+  border-radius: 8px;
+  padding: 8px 20px;
+  margin-top: 10px;
+  width: 220px;
+  color: white;
+  font-size: 14px;
   display: flex;
   flex-direction: column;
-  padding: 0 20px;
-  margin-top: 10px;
-  gap: 8px;
-  width: 220px;
+}
+
+.slider-container h3 {
+  margin: 8px 0 4px;
   font-size: 14px;
-  color: white;
+  font-weight: 500;
 }
 
 .slider-wrapper {
@@ -204,14 +241,4 @@ body, html {
   min-width: 30px;
   text-align: right;
   font-weight: 600;
-}
-
-/* Tooltip */
-.deck-tooltip {
-  font-family: 'Poppins', sans-serif !important;
-  font-size: 0.9em;
-  background-color: #333 !important;
-  color: #fff !important;
-  padding: 6px;
-  border-radius: 4px;
 }

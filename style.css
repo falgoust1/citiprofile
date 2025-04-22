@@ -126,20 +126,20 @@ body, html {
 
 /* OVERRIDE: .layer-controls & .slider-container styling */
 .layer-controls {
-      position: absolute;
-      top: 20px;        /* ou 50px si vous voulez partir sous le header */
-      left: 20px;
-      bottom: 20px;     /* étire jusqu’à 20px du bas de l’écran */
-      width: 240px;     /* ou la largeur que vous souhaitez */
-      background: rgba(38, 41, 44, 0.95);
-      border: 1px solid #435dd8;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-      border-radius: 8px;
-      padding: 10px;
-      overflow-y: auto; /* scroll si trop long */
-      z-index: 1000;
-      color: #ffffffff
-    }
+  position: absolute;
+  top: 20px;        /* ou 50px si vous voulez partir sous le header */
+  left: 20px;
+  bottom: 20px;     /* étire jusqu’à 20px du bas de l’écran */
+  width: 240px;     /* ou la largeur que vous souhaitez */
+  background: rgba(38, 41, 44, 0.95);
+  border: 1px solid #435dd8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  border-radius: 8px;
+  padding: 10px;
+  overflow-y: auto; /* scroll si trop long */
+  color: #ffffffff;
+  z-index: 1000;
+}
 
 .layer-controls label {
   display: flex;
@@ -246,4 +246,57 @@ body, html {
   min-width: 30px;
   text-align: right;
   font-weight: 600;
+}
+
+/* -------------------------------------------------------
+   Styles pour les filtres temporels (mois, jours, heures)
+   ------------------------------------------------------- */
+
+/* groupement des cases à cocher */
+.slider-container .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* chaque label de checkbox */
+.slider-container .checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 60px;
+}
+
+/* espace entre checkbox et texte */
+.slider-container .checkbox-group label input {
+  margin-right: 4px;
+}
+
+/* noUiSlider : conteneur du slider */
+.noUi-target {
+  margin: 10px 0;
+}
+
+/* rail du slider */
+.noUi-horizontal {
+  height: 6px;
+  border-radius: 3px;
+  background: #435dd8;
+}
+
+/* portion “connectée” */
+.noUi-horizontal .noUi-connect {
+  background: #76c7c0;
+}
+
+/* poignée de contrôle */
+.noUi-origin .noUi-handle {
+  width: 14px;
+  height: 14px;
+  top: -4px;
+  background: #fff;
+  border: 2px solid #435dd8;
+  border-radius: 50%;
+  box-shadow: 0 0 2px rgba(0,0,0,0.5);
 }

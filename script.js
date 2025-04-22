@@ -27,7 +27,13 @@ const defaultState = {
     pitch: 40,
     bearing: 0
   },
-  filters: { pied: true, vehicule: true },
+  filters: {
+    pied: true,
+    vehicule: true,
+    months: [],       // mois sélectionnés (1–12)
+    daysOfWeek: [],   // jours sélectionnés (1=Lu…7=Di)
+    hours: [0, 23]    // plage d’heures
+  },
   layerType: 'grid',
   sliderValue: 1000
 };
@@ -79,101 +85,166 @@ fetch("ZN_bat_60-61_w_IDs.geojson")
   })
   .catch(err => console.error("Erreur JSON:", err));
 
+
 /** Create DeckGL + Chart + controls instance **/
 function createInstance({ container, controlsPrefix, donutId, initialState, geo }) {
   const state = {
     viewState: { ...initialState.viewState },
-    filters: { ...initialState.filters },
-    layerType: initialState.layerType,
-    sliderValue: initialState.sliderValue
+    filters: {
+      pied:        initialState.filters.pied,
+      vehicule:    initialState.filters.vehicule,
+      months:      [...initialState.filters.months],
+      daysOfWeek:  [...initialState.filters.daysOfWeek],
+      hours:       [...initialState.filters.hours]
+    },
+    layerType:    initialState.layerType,
+    sliderValue:  initialState.sliderValue
   };
 
-  // Chart.js donut
+  /*––– Donut –––*/
   const ctx = document.getElementById(donutId).getContext('2d');
-  const chart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['À pied','Véhicule'],
-      datasets: [{ data: [0,0], backgroundColor: ['#76c7c0','#f27c66'], hoverOffset: 8 }]
-    },
-    options: {
-      cutout: '60%',
-      plugins: {
-        title: { display:true, text:"Part de piétons et d'automobilistes", color:'#fff', font:{size:18}, padding:{top:10,bottom:20} },
-        legend:{ display:false },
-        datalabels:{ color:'#fff', formatter:(v,ctx)=>{
-          const tot = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
-          return tot?`${Math.round(v/tot*100)}%`:'';
-        }}
-      }
-    },
-    plugins: [ChartDataLabels]
+  const chart = new Chart(ctx,{
+    type:'doughnut',
+    data:{ labels:['À pied','Véhicule'], datasets:[{ data:[0,0], backgroundColor:['#76c7c0','#f27c66'] }]},
+    options:{ cutout:'60%', plugins:{ legend:{display:false}, datalabels:{ color:'#fff', formatter:(v,ctx)=>{ const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); return t?Math.round(v/t*100)+'%':''; }}}},
+    plugins:[ChartDataLabels]
   });
 
-  // DeckGL
+  /*––– DeckGL –––*/
   const deckgl = new DeckGL({
     container,
-    crossOrigin:'anonymous',
     mapStyle:"https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json",
     controller:true,
     viewState: state.viewState,
     onViewStateChange: ({viewState})=>{
       state.viewState = viewState;
-      if(isSplit && mirrorEnabled){
-        const other = container==='canvas-left'?'right':'left';
-        if(instances[other]){
-          instances[other].deckgl.setProps({ viewState });
-          instances[other].state.viewState = viewState;
-        }
-      }
-      deckgl.setProps({ viewState: state.viewState });
+      deckgl.setProps({ viewState });
     },
-    getTooltip: ({object})=> makeTooltip(object),
-    layers: []
+    layers:[]
   });
 
-  // Controls listeners
   attachControlListeners(controlsPrefix, state, updateView);
 
-  // Initial update
-  updateView();
+  /*––– Helpers –––*/
+  const getCheckedMonths = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(e=>+e.value);
+  const getCheckedDays   = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(e=>e.value);
+  const setGroupChecked  = (id,check)=>document.querySelectorAll(`#${id} input`).forEach(cb=>cb.checked=check);
+  const attachToggleButton = (btn,id) =>{
+    if(!btn) return;
+    btn.addEventListener('click',()=>{
+      const boxes=document.querySelectorAll(`#${id} input`);
+      const all=Array.from(boxes).every(cb=>cb.checked);
+      setGroupChecked(id,!all);
+      btn.textContent = all?'Tout cocher':'Tout décocher';
+      state.filters.months     = id.startsWith('month') ? getCheckedMonths(id):state.filters.months;
+      state.filters.daysOfWeek = id.startsWith('dow')   ? getCheckedDays(id):state.filters.daysOfWeek;
+      onFiltersChange();
+    });
+  };
 
-  function updateView() {
-    const pts = [];
-    if(state.filters.pied) pts.push(...geo.piedPts);
+  /*––– Listeners cases –––*/
+  document.querySelectorAll(`#month-checkboxes-${controlsPrefix} input`)
+          .forEach(cb=>cb.addEventListener('change',()=>{
+            state.filters.months=getCheckedMonths(`month-checkboxes-${controlsPrefix}`);
+            onFiltersChange();
+          }));
+  document.querySelectorAll(`#dow-checkboxes-${controlsPrefix} input`)
+          .forEach(cb=>cb.addEventListener('change',()=>{
+            state.filters.daysOfWeek=getCheckedDays(`dow-checkboxes-${controlsPrefix}`);
+            onFiltersChange();
+          }));
+
+  /*––– Boutons toggle –––*/
+  attachToggleButton(
+    document.querySelector(`.toggle-btn[data-target="month-checkboxes-${controlsPrefix}"]`),
+    `month-checkboxes-${controlsPrefix}`
+  );
+  attachToggleButton(
+    document.querySelector(`.toggle-btn[data-target="dow-checkboxes-${controlsPrefix}"]`),
+    `dow-checkboxes-${controlsPrefix}`
+  );
+
+  /*––– Slider heures –––*/
+  // valeurs cochées par défaut  ➜  on remplit d'emblée les filtres
+state.filters.months     = getCheckedMonths(`month-checkboxes-${controlsPrefix}`);
+state.filters.daysOfWeek = getCheckedDays  (`dow-checkboxes-${controlsPrefix}`);
+
+// rendu initial de la carte
+updateView();
+
+  const hourSliderEl = document.getElementById(`hour-slider-${controlsPrefix}`);
+  noUiSlider.create(hourSliderEl,{
+    start:state.filters.hours, connect:true, step:1, range:{min:0,max:23},
+    format:{ to:v=>Math.round(v), from:v=>+v }
+  });
+  hourSliderEl.noUiSlider.on('update',v=>{
+    state.filters.hours=v.map(n=>+n);
+    onFiltersChange();
+  });
+
+  /*––– Reset –––*/
+  document.getElementById(`reset-temporal-filters-${controlsPrefix}`)
+          .addEventListener('click',()=>{
+            ['month-checkboxes','dow-checkboxes'].forEach(id=>setGroupChecked(`${id}-${controlsPrefix}`,false));
+            state.filters.months=[]; state.filters.daysOfWeek=[];
+            hourSliderEl.noUiSlider.set([0,23]);
+            onFiltersChange();
+          });
+
+  function onFiltersChange(){ updateView(); }
+
+  function updateView(){
+    let pts=[];
+    if(state.filters.pied)     pts.push(...geo.piedPts);
     if(state.filters.vehicule) pts.push(...geo.vehiculePts);
-    const layer = buildLayer(state.layerType, pts, state.sliderValue);
-    deckgl.setProps({ layers:[layer], viewState: state.viewState });
-    const cP = pts.filter(d=>d.transp_kind===60).length;
-    const cV = pts.filter(d=>d.transp_kind===61).length;
-    chart.data.datasets[0].data=[cP,cV]; chart.update();
+
+    if(state.filters.months.length===0||state.filters.daysOfWeek.length===0){ pts=[]; }
+    else{
+      pts=pts.filter(d=>{
+        const m = +d.month;
+        if(state.filters.months.length && !state.filters.months.includes(m)) return false;
+        const w = (''+d.day_of_week).trim();
+        if(state.filters.daysOfWeek.length && !state.filters.daysOfWeek.includes(w)) return false;
+        const h = +d.hour;
+        return h>=state.filters.hours[0] && h<=state.filters.hours[1];
+      });
+    }
+
+    deckgl.setProps({ layers:[ buildLayer(state.layerType,pts,state.sliderValue) ]});
+    chart.data.datasets[0].data=[ pts.filter(p=>p.transp_kind===60).length,
+                                  pts.filter(p=>p.transp_kind===61).length ];
+    chart.update();
   }
 
   return { deckgl, chart, state };
 }
 
+
+
 /** Build DeckGL layer **/
 function buildLayer(type, data, slider) {
   switch(type){
     case 'scatter': return new ScatterplotLayer({ id:'ScatterplotLayer', data, radiusMinPixels:1.4, radiusMaxPixels:50, getRadius:1, radiusUnits:'pixels', getFillColor:d=>d.prixm2>4000?[202,0,32]:d.prixm2>3000?[244,165,130]:d.prixm2>2000?[146,197,222]:[5,113,176], getPosition:d=>[d.lon,d.lat], opacity:0.7 });
-    case 'grid': return new GridLayer({ id:'GridLayer', data, cellSize:100, coverage:0.8, extruded:true, getPosition:d=>[d.lon,d.lat], getElevationValue:pts=>pts.length, colorAggregation:'SUM', colorScaleType:'quantile', opacity:1, pickable:true, colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
-    case 'heat': return new HeatmapLayer({ id:'HeatmapLayer', data, radiusPixels:50, threshold:0.5, getPosition:d=>[d.lon,d.lat] });
-    case 'hex': return new HexagonLayer({ id:'HexagonLayer', data, getPosition:d=>[d.lon,d.lat], radius:50, coverage:0.8, extruded:true, getElevationValue:pts=>pts.length, colorAggregation:'SUM', colorScaleType:'quantile', opacity:0.8, pickable:true, colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
-    case 'screen': return new ScreenGridLayer({ id:'ScreenGridLayer', data, cellSizePixels:20, opacity:0.8, getPosition:d=>[d.lon,d.lat], colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
-    case 'poly': return new GeoJsonLayer({ id:'GeoJsonLayer', data:'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/bat6061s2.geojson', extruded:true, pickable:true, getPolygon:d=>d.geometry.coordinates, getElevation:d=>d.properties.HAUTEUR, getFillColor:d=>d.properties.nbpoints<10?[1,152,189]:d.properties.nbpoints<40?[216,254,181]:[209,55,78], getFilterValue:d=>d.properties.nbpoints, filterRange:[0,slider], extensions:[new DataFilterExtension({filterSize:1})] });
-    default: return new ScatterplotLayer({ id:'empty', data:[] });
+    case 'grid':    return new GridLayer({ id:'GridLayer', data, cellSize:100, coverage:0.8, extruded:true, getPosition:d=>[d.lon,d.lat], getElevationValue:pts=>pts.length, colorAggregation:'SUM', colorScaleType:'quantile', opacity:1, pickable:true, colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
+    case 'heat':    return new HeatmapLayer({ id:'HeatmapLayer', data, radiusPixels:50, threshold:0.5, getPosition:d=>[d.lon,d.lat] });
+    case 'hex':     return new HexagonLayer({ id:'HexagonLayer', data, getPosition:d=>[d.lon,d.lat], radius:50, coverage:0.8, extruded:true, getElevationValue:pts=>pts.length, colorAggregation:'SUM', colorScaleType:'quantile', opacity:0.8, pickable:true, colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
+    case 'screen':  return new ScreenGridLayer({ id:'ScreenGridLayer', data, cellSizePixels:20, opacity:0.8, getPosition:d=>[d.lon,d.lat], colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
+    case 'poly':    return new GeoJsonLayer({ id:'GeoJsonLayer', data:'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/bat6061s2.geojson', extruded:true, pickable:true, getPolygon:d=>d.geometry.coordinates, getElevation:d=>d.properties.HAUTEUR, getFillColor:d=>d.properties.nbpoints<10?[1,152,189]:d.properties.nbpoints<40?[216,254,181]:[209,55,78], getFilterValue:d=>d.properties.nbpoints, filterRange:[0,slider], extensions:[new DataFilterExtension({filterSize:1})] });
+    default:       return new ScatterplotLayer({ id:'empty', data:[] });
   }
 }
 
 /** Tooltip generator **/
 function makeTooltip(obj){
   if(!obj) return null;
-  if(obj.properties && obj.properties.nbpoints!==undefined) return { html:`<b>Bâtiment</b><br>Points: ${obj.properties.nbpoints}`, style:{backgroundColor:'#333',color:'#fff',padding:'6px',fontSize:'0.9em'} };
-  if(obj.count!==undefined) return { html:`<b>Agrégation</b><br>Points: ${obj.count}`, style:{backgroundColor:'#2a2a2a',color:'#eee',padding:'6px',fontSize:'0.9em'} };
+  if(obj.properties && obj.properties.nbpoints!==undefined)
+    return { html:`<b>Bâtiment</b><br>Points: ${obj.properties.nbpoints}`, style:{backgroundColor:'#333',color:'#fff',padding:'6px',fontSize:'0.9em'} };
+  if(obj.count!==undefined)
+    return { html:`<b>Agrégation</b><br>Points: ${obj.count}`, style:{backgroundColor:'#2a2a2a',color:'#eee',padding:'6px',fontSize:'0.9em'} };
   return null;
 }
 
-/** Controls listeners **/
+/** Controls listeners (couches & transport) **/
 function attachControlListeners(prefix, state, onChange){
   ['scatter','grid','heat','hex','screen','poly'].forEach(type=>{
     const el=document.getElementById(`radio-${type}-${prefix}`);
@@ -199,7 +270,11 @@ function enterSplit(){
 
   ['left','right'].forEach(side=>{
     instances[side]=createInstance({
-      container:`canvas-${side}`, controlsPrefix:side, donutId:`donut-${side}`, initialState:instances.single.state, geo:globalGeo
+      container:`canvas-${side}`,
+      controlsPrefix:side,
+      donutId:`donut-${side}`,
+      initialState: instances.single.state,
+      geo: globalGeo
     });
   });
 }
@@ -208,7 +283,8 @@ function enterSplit(){
 function exitSplit(){
   if(!isSplit) return; isSplit=false;
   ['left','right'].forEach(side=>{
-    const inst=instances[side]; if(inst){ inst.deckgl.finalize(); inst.chart.destroy(); delete instances[side]; }
+    const inst=instances[side];
+    if(inst){ inst.deckgl.finalize(); inst.chart.destroy(); delete instances[side]; }
   });
   document.getElementById('split-view').style.display='none';
   document.getElementById('single-view').style.display='block';

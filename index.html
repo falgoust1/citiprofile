@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,6 +16,13 @@
   <!-- Chart.js + datalabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+  <!-- noUiSlider (filtres temporels) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css"
+  />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -40,12 +46,16 @@
     <!-- SINGLE VIEW -->
     <div id="single-view">
       <div id="layer-controls-single" class="layer-controls">
+
+        <!-- Couche brute -->
         <details class="layer-group">
           <summary>Couche brut</summary>
           <label class="label">
             <input type="radio" name="layer-single" id="radio-scatter-single"> Scatterplot
           </label>
         </details>
+
+        <!-- Agrégations dans une grille -->
         <details class="layer-group">
           <summary>Agrégations dans une grille</summary>
           <label class="label">
@@ -61,6 +71,8 @@
             <input type="radio" name="layer-single" id="radio-screen-single"> ScreenGrid
           </label>
         </details>
+
+        <!-- Agrégations dans les bâtiments -->
         <details class="layer-group">
           <summary>Agrégations dans les bâtiments</summary>
           <label class="label">
@@ -74,6 +86,8 @@
             </div>
           </div>
         </details>
+
+        <!-- Filtres de transport -->
         <details class="layer-group">
           <summary>Filtres de transport</summary>
           <label class="label">
@@ -83,6 +97,70 @@
             <input type="checkbox" id="filter-vehicule-single" checked> Véhicule
           </label>
         </details>
+
+        <!-- Nouveaux filtres temporels -->
+        <details class="layer-group">
+          <summary>Filtres temporels</summary>
+
+          <!-- Mois -->
+                     
+        <details class="subfilter">
+            <summary>
+            <span>Mois</span>   
+            <button type="button" class="toggle-btn" 
+                    data-target="month-checkboxes-single">Tout décocher</button>
+            </summary>
+          <div class="slider-container">
+            <div class="checkbox-group" id="month-checkboxes-single">
+              <label><input type="checkbox" value="1"  checked> Jan</label>
+              <label><input type="checkbox" value="2"  checked> Fév</label>
+              <label><input type="checkbox" value="3"  checked> Mar</label>
+              <label><input type="checkbox" value="4"  checked> Avr</label>
+              <label><input type="checkbox" value="5"  checked> Mai</label>
+              <label><input type="checkbox" value="6"  checked> Jun</label>
+              <label><input type="checkbox" value="7"  checked> Jul</label>
+              <label><input type="checkbox" value="8"  checked> Aoû</label>
+              <label><input type="checkbox" value="9"  checked> Sep</label>
+              <label><input type="checkbox" value="10" checked> Oct</label>
+              <label><input type="checkbox" value="11" checked> Nov</label>
+              <label><input type="checkbox" value="12" checked> Déc</label>
+            </div>
+          </div>
+        </details>
+
+
+          <!-- Jours de la semaine -->
+        <details class="subfilter">
+          <summary>
+            <span>Jours</span>  
+            <button type="button"class="toggle-btn"
+                    data-target="dow-checkboxes-single">Tout décocher</button>         
+          </summary>
+          <div class="slider-container">
+            <div class="checkbox-group" id="dow-checkboxes-single">
+              <label><input type="checkbox" value="Lu" checked> Lu</label>
+              <label><input type="checkbox" value="Ma" checked> Ma</label>
+              <label><input type="checkbox" value="Me" checked> Me</label>
+              <label><input type="checkbox" value="Je" checked> Je</label>
+              <label><input type="checkbox" value="Ve" checked> Ve</label>
+              <label><input type="checkbox" value="Sa" checked> Sa</label>
+              <label><input type="checkbox" value="Di" checked> Di</label>
+            </div>
+          </div>
+        </details>
+
+
+          <!-- Heures -->
+          <div class="slider-container">
+            <h3>Heures (0–23)</h3>
+            <div id="hour-slider-single"></div>
+            <div style="text-align:right; margin-top:4px;">
+              <button id="reset-temporal-filters-single">Réinitialiser</button>
+            </div>
+          </div>
+
+        </details>
+
       </div>
       <div id="deck-canvas-single" class="deck-canvas"></div>
       <div id="chart-panel-single" class="chart-panel">
@@ -92,15 +170,20 @@
 
     <!-- SPLIT VIEW -->
     <div id="split-view" class="split-view" style="display:none">
+
       <!-- Left Panel -->
       <div class="panel">
         <div id="controls-left" class="layer-controls">
+
+          <!-- Couche brute -->
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
               <input type="radio" name="layer-left" id="radio-scatter-left"> Scatterplot
             </label>
           </details>
+
+          <!-- Agrégations dans une grille -->
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
@@ -116,6 +199,8 @@
               <input type="radio" name="layer-left" id="radio-screen-left"> ScreenGrid
             </label>
           </details>
+
+          <!-- Agrégations dans les bâtiments -->
           <details class="layer-group">
             <summary>Agrégations dans les bâtiments</summary>
             <label class="label">
@@ -129,6 +214,8 @@
               </div>
             </div>
           </details>
+
+          <!-- Filtres de transport -->
           <details class="layer-group">
             <summary>Filtres de transport</summary>
             <label class="label">
@@ -138,6 +225,68 @@
               <input type="checkbox" id="filter-vehicule-left" checked> Véhicule
             </label>
           </details>
+
+          <!-- Nouveaux filtres temporels -->
+          <details class="layer-group">
+            <summary>Filtres temporels</summary>
+
+            <!-- Mois -->
+            <details class="subfilter">
+              <summary>
+              <span>Mois</span>   
+              <button type="button" class="toggle-btn" 
+                      data-target="month-checkboxes-left">Tout décocher</button>
+              </summary>
+            <div class="slider-container">
+              <div class="checkbox-group" id="month-checkboxes-left">
+                <label><input type="checkbox" value="1"  checked> Jan</label>
+                <label><input type="checkbox" value="2"  checked> Fév</label>
+                <label><input type="checkbox" value="3"  checked> Mar</label>
+                <label><input type="checkbox" value="4"  checked> Avr</label>
+                <label><input type="checkbox" value="5"  checked> Mai</label>
+                <label><input type="checkbox" value="6"  checked> Jun</label>
+                <label><input type="checkbox" value="7"  checked> Jul</label>
+                <label><input type="checkbox" value="8"  checked> Aoû</label>
+                <label><input type="checkbox" value="9"  checked> Sep</label>
+                <label><input type="checkbox" value="10" checked> Oct</label>
+                <label><input type="checkbox" value="11" checked> Nov</label>
+                <label><input type="checkbox" value="12" checked> Déc</label>
+              </div>
+            </div>
+          </details>
+
+            <!-- Jours de la semaine -->
+            <details class="subfilter">
+              <summary>
+                <span>Jours</span>  
+                <button type="button"class="toggle-btn"
+                        data-target="dow-checkboxes-left">Tout décocher</button>         
+              </summary>
+              <div class="slider-container">
+                <div class="checkbox-group" id="dow-checkboxes-left">
+                  <label><input type="checkbox" value="Lu" checked> Lu</label>
+                  <label><input type="checkbox" value="Ma" checked> Ma</label>
+                  <label><input type="checkbox" value="Me" checked> Me</label>
+                  <label><input type="checkbox" value="Je" checked> Je</label>
+                  <label><input type="checkbox" value="Ve" checked> Ve</label>
+                  <label><input type="checkbox" value="Sa" checked> Sa</label>
+                  <label><input type="checkbox" value="Di" checked> Di</label>
+                </div>
+              </div>
+            </details>
+    
+
+            <!-- Heures -->
+            <div class="slider-container">
+              <h3>Heures (0–23)</h3>
+              <div id="hour-slider-left"></div>
+              <div style="text-align:right; margin-top:4px;">
+                <button id="reset-temporal-filters-left">Réinitialiser</button>
+              </div>
+            </div>
+
+          </details>
+
         </div>
         <div id="canvas-left" class="deck-canvas"></div>
         <div id="chart-panel-left" class="chart-panel">
@@ -148,12 +297,16 @@
       <!-- Right Panel -->
       <div class="panel">
         <div id="controls-right" class="layer-controls">
+
+          <!-- Couche brute -->
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
               <input type="radio" name="layer-right" id="radio-scatter-right"> Scatterplot
             </label>
           </details>
+
+          <!-- Agrégations dans une grille -->
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
@@ -169,8 +322,10 @@
               <input type="radio" name="layer-right" id="radio-screen-right"> ScreenGrid
             </label>
           </details>
+
+          <!-- Agrégations dans les bâtiments -->
           <details class="layer-group">
-            <summary>Agrégations dans les bâtiments</summary>
+            <summary>Agrégation dans les bâtiments</summary>
             <label class="label">
               <input type="radio" name="layer-right" id="radio-poly-right"> Bâtiments 3D
             </label>
@@ -182,6 +337,8 @@
               </div>
             </div>
           </details>
+
+          <!-- Filtres de transport -->
           <details class="layer-group">
             <summary>Filtres de transport</summary>
             <label class="label">
@@ -191,14 +348,76 @@
               <input type="checkbox" id="filter-vehicule-right" checked> Véhicule
             </label>
           </details>
+
+          <!-- Nouveaux filtres temporels -->
+          <details class="layer-group">
+            <summary>Filtres temporels</summary>
+
+            <!-- Mois -->
+            <details class="subfilter">
+              <summary>
+              <span>Mois</span>   
+              <button type="button" class="toggle-btn" 
+                      data-target="month-checkboxes-right">Tout décocher</button>
+              </summary>
+            <div class="slider-container">
+              <div class="checkbox-group" id="month-checkboxes-right">
+                <label><input type="checkbox" value="1"  checked> Jan</label>
+                <label><input type="checkbox" value="2"  checked> Fév</label>
+                <label><input type="checkbox" value="3"  checked> Mar</label>
+                <label><input type="checkbox" value="4"  checked> Avr</label>
+                <label><input type="checkbox" value="5"  checked> Mai</label>
+                <label><input type="checkbox" value="6"  checked> Jun</label>
+                <label><input type="checkbox" value="7"  checked> Jul</label>
+                <label><input type="checkbox" value="8"  checked> Aoû</label>
+                <label><input type="checkbox" value="9"  checked> Sep</label>
+                <label><input type="checkbox" value="10" checked> Oct</label>
+                <label><input type="checkbox" value="11" checked> Nov</label>
+                <label><input type="checkbox" value="12" checked> Déc</label>
+              </div>
+            </div>
+          </details>
+
+            <!-- Jours de la semaine -->
+            <details class="subfilter">
+              <summary>
+                <span>Jours</span>  
+                <button type="button"class="toggle-btn"
+                        data-target="dow-checkboxes-right">Tout décocher</button>         
+              </summary>
+              <div class="slider-container">
+                <div class="checkbox-group" id="dow-checkboxes-right">
+                  <label><input type="checkbox" value="Lu" checked> Lu</label>
+                  <label><input type="checkbox" value="Ma" checked> Ma</label>
+                  <label><input type="checkbox" value="Me" checked> Me</label>
+                  <label><input type="checkbox" value="Je" checked> Je</label>
+                  <label><input type="checkbox" value="Ve" checked> Ve</label>
+                  <label><input type="checkbox" value="Sa" checked> Sa</label>
+                  <label><input type="checkbox" value="Di" checked> Di</label>
+                </div>
+              </div>
+            </details>
+    
+
+            <!-- Heures -->
+            <div class="slider-container">
+              <h3>Heures (0–23)</h3>
+              <div id="hour-slider-right"></div>
+              <div style="text-align:right; margin-top:4px;">
+                <button id="reset-temporal-filters-right">Réinitialiser</button>
+              </div>
+            </div>
+
+          </details>
+
         </div>
         <div id="canvas-right" class="deck-canvas"></div>
         <div id="chart-panel-right" class="chart-panel">
           <canvas id="donut-right"></canvas>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 
   <script src="script.js"></script>

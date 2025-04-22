@@ -1,67 +1,206 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DeckGL / Scatter</title>
+  <title>DeckGL / Citiprofile</title>
+
+  <!-- Deck.gl & MapLibre -->
   <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
-  <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" /> 
+  <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
+
+  <!-- Mapbox GL (pour compatibilité) -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.css" rel="stylesheet" />
+
+  <!-- Chart.js + datalabels -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
   <link rel="stylesheet" href="style.css">
-    
 </head>
 <body>
 
-  <div id="container">
-    <!-- Contrôles pour la sélection des couches -->
-    <div id="layer-controls">
-      <h3></h3>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-scatter"> Scatterplot
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-grid" checked> GridExtrude
-      </label>
-
-      
-      
-
-      <label class="label">
-        <input type="radio" name="layer" id="radio-heat"> Heatmap
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-hex"> Hexbin 3D
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-screen"> ScreenGrid       
-      </label>
-
-      <label class="label">
-        <input type="radio" name="layer" id="radio-poly"> Bâtiments en 3D
-      </label>
-
-      <div id="slider-container">
-        <h3> Maximum de points par bâtiment :</h3>
-        <div class="slider-wrapper">
-          <input type="range" id="point-slider" min="0" max="700" value="700">
-          <span id="slider-value">700</span>
-        </div>
-      </div>
-      
-      
-      
-      
-
-    
-
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-left">
+      <span class="bold-text">Rennes</span>
+      <button id="btn-compare">Comparer</button>
+      <button id="btn-single" style="display:none;">Carte unique</button>
     </div>
-
-   
-
-
-    <!-- Le Canvas de DeckGL -->
-    <div id="deck-canvas"></div>
+    <div id="header-right">
+      <button id="btn-sync" style="display:none;">Miroir : off</button>
+    </div>
   </div>
 
-  <script src="./script.js"></script>
+  <!-- CONTAINER -->
+  <div id="container">
+
+    <!-- SINGLE VIEW -->
+    <div id="single-view">
+      <div id="layer-controls-single" class="layer-controls">
+        <details class="layer-group">
+          <summary>Couche brut</summary>
+          <label class="label">
+            <input type="radio" name="layer-single" id="radio-scatter-single"> Scatterplot
+          </label>
+        </details>
+        <details class="layer-group">
+          <summary>Agrégations dans une grille</summary>
+          <label class="label">
+            <input type="radio" name="layer-single" id="radio-grid-single" checked> GridExtrude
+          </label>
+          <label class="label">
+            <input type="radio" name="layer-single" id="radio-heat-single"> Heatmap
+          </label>
+          <label class="label">
+            <input type="radio" name="layer-single" id="radio-hex-single"> Hexbin 3D
+          </label>
+          <label class="label">
+            <input type="radio" name="layer-single" id="radio-screen-single"> ScreenGrid
+          </label>
+        </details>
+        <details class="layer-group">
+          <summary>Agrégations dans les bâtiments</summary>
+          <label class="label">
+            <input type="radio" name="layer-single" id="radio-poly-single"> Bâtiments 3D
+          </label>
+          <div class="slider-container">
+            <h3>Maximum de points par bâtiment :</h3>
+            <div class="slider-wrapper">
+              <input type="range" id="point-slider-single" min="0" max="1000" value="1000">
+              <span id="slider-value-single">1000</span>
+            </div>
+          </div>
+        </details>
+        <details class="layer-group">
+          <summary>Filtres de transport</summary>
+          <label class="label">
+            <input type="checkbox" id="filter-pied-single" checked> À pied
+          </label>
+          <label class="label">
+            <input type="checkbox" id="filter-vehicule-single" checked> Véhicule
+          </label>
+        </details>
+      </div>
+      <div id="deck-canvas-single" class="deck-canvas"></div>
+      <div id="chart-panel-single" class="chart-panel">
+        <canvas id="donut-single"></canvas>
+      </div>
+    </div>
+
+    <!-- SPLIT VIEW -->
+    <div id="split-view" class="split-view" style="display:none">
+      <!-- Left Panel -->
+      <div class="panel">
+        <div id="controls-left" class="layer-controls">
+          <details class="layer-group">
+            <summary>Couche brut</summary>
+            <label class="label">
+              <input type="radio" name="layer-left" id="radio-scatter-left"> Scatterplot
+            </label>
+          </details>
+          <details class="layer-group">
+            <summary>Agrégations dans une grille</summary>
+            <label class="label">
+              <input type="radio" name="layer-left" id="radio-grid-left" checked> GridExtrude
+            </label>
+            <label class="label">
+              <input type="radio" name="layer-left" id="radio-heat-left"> Heatmap
+            </label>
+            <label class="label">
+              <input type="radio" name="layer-left" id="radio-hex-left"> Hexbin 3D
+            </label>
+            <label class="label">
+              <input type="radio" name="layer-left" id="radio-screen-left"> ScreenGrid
+            </label>
+          </details>
+          <details class="layer-group">
+            <summary>Agrégations dans les bâtiments</summary>
+            <label class="label">
+              <input type="radio" name="layer-left" id="radio-poly-left"> Bâtiments 3D
+            </label>
+            <div class="slider-container">
+              <h3>Maximum de points par bâtiment :</h3>
+              <div class="slider-wrapper">
+                <input type="range" id="point-slider-left" min="0" max="1000" value="1000">
+                <span id="slider-value-left">1000</span>
+              </div>
+            </div>
+          </details>
+          <details class="layer-group">
+            <summary>Filtres de transport</summary>
+            <label class="label">
+              <input type="checkbox" id="filter-pied-left" checked> À pied
+            </label>
+            <label class="label">
+              <input type="checkbox" id="filter-vehicule-left" checked> Véhicule
+            </label>
+          </details>
+        </div>
+        <div id="canvas-left" class="deck-canvas"></div>
+        <div id="chart-panel-left" class="chart-panel">
+          <canvas id="donut-left"></canvas>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="panel">
+        <div id="controls-right" class="layer-controls">
+          <details class="layer-group">
+            <summary>Couche brut</summary>
+            <label class="label">
+              <input type="radio" name="layer-right" id="radio-scatter-right"> Scatterplot
+            </label>
+          </details>
+          <details class="layer-group">
+            <summary>Agrégations dans une grille</summary>
+            <label class="label">
+              <input type="radio" name="layer-right" id="radio-grid-right" checked> GridExtrude
+            </label>
+            <label class="label">
+              <input type="radio" name="layer-right" id="radio-heat-right"> Heatmap
+            </label>
+            <label class="label">
+              <input type="radio" name="layer-right" id="radio-hex-right"> Hexbin 3D
+            </label>
+            <label class="label">
+              <input type="radio" name="layer-right" id="radio-screen-right"> ScreenGrid
+            </label>
+          </details>
+          <details class="layer-group">
+            <summary>Agrégations dans les bâtiments</summary>
+            <label class="label">
+              <input type="radio" name="layer-right" id="radio-poly-right"> Bâtiments 3D
+            </label>
+            <div class="slider-container">
+              <h3>Maximum de points par bâtiment :</h3>
+              <div class="slider-wrapper">
+                <input type="range" id="point-slider-right" min="0" max="1000" value="1000">
+                <span id="slider-value-right">1000</span>
+              </div>
+            </div>
+          </details>
+          <details class="layer-group">
+            <summary>Filtres de transport</summary>
+            <label class="label">
+              <input type="checkbox" id="filter-pied-right" checked> À pied
+            </label>
+            <label class="label">
+              <input type="checkbox" id="filter-vehicule-right" checked> Véhicule
+            </label>
+          </details>
+        </div>
+        <div id="canvas-right" class="deck-canvas"></div>
+        <div id="chart-panel-right" class="chart-panel">
+          <canvas id="donut-right"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

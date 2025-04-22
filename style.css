@@ -1,187 +1,217 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
-body {margin: 0; padding: 0;}
-#container {width: 100vw; height: 100vh;}
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: #323B42;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1001;
+}
 
-            /* Conteneur pour les contrôles */
-                        #layer-controls {
-                              display: flex;
-                              flex-direction: column;
-                              font-size: 16px;
-                              color: #fff;
-                              font-family: Poppins;
-                              gap: 20px;
-                        }
-                        
-                        #layer-controls * {
-                              box-sizing: border-box;
-                              z-index: 1000;
-                              padding: 0;
-                              margin-left: 25px;
-                              
-                            }
-                            
-                        
-                        #layer-controls label {
-                              display: flex;
-                              align-items: center;
-                              
-                              gap: 15px;
-                              padding: 0px 20px;
-                              width: 220px;
-                              cursor: pointer;
-                              height: 50px;
-                              position: relative;
-                        }
-                        
-                        #layer-controls label::before {
-                              position: absolute;
-                              content: "";
-                              top: 50%;
-                              left: 50%;
-                              transform: translate(-50%, -50%);
-                              width: 220px;
-                              height: 45px;
-                              z-index: -1;
-                              transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                              border-radius: 10px;
-                              border: 2px solid transparent;
-                        }
-                        #layer-controls label:hover::before {
-                              transition: all 0.2s ease;
-                              
-                              background-color: #2a2e3c;
-                        }
-                        
-                        #layer-controls .label:has(input:checked)::before {
-                              background-color: #2d3750;
-                              border-color: #435dd8;
-                              height: 50px;
-                              
-                        }
-                        #layer-controls .label .text {
-                              color: #fff;
-                        }
-                        
-                        #layer-controls .label input[type="radio"] {
-                              background-color: #202030;
-                              appearance: none;
-                              width: 17px;
-                              height: 17px;
-                              border-radius: 50%;
-                              display: flex;
-                              justify-content: center;
-                              align-items: center;
-                              z-index: 1000;
-                        }
-                        #layer-controls .label input[type="radio"]:checked {
-                              background-color: #435dd8;
-                              -webkit-animation: puls 0.7s forwards;
-                              animation: pulse 0.7s forwards;
-                              
-                        }
-                        
-                        #layer-controls .label input[type="radio"]:before {
-                              content: "";
-                              width: 6px;
-                              height: 6px;
-                              border-radius: 50%;
-                              transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
-                              background-color: #fff;
-                              transform: scale(0);
-                              
-                        }
-                        
-                        #layer-controls .label input[type="radio"]:checked::before {
-                              transform: scale(1);
-                              
-                        }
-                        
-                        @keyframes pulse {
-                              0% {
-                              box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-                              }
-                              70% {
-                              box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
-                              }
-                              100% {
-                              box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-                              }
-                        }
+#header-left .bold-text {
+  font-weight: 600;
+  color: white;
+  margin-right: 20px;
+}
 
+#header button {
+  margin-right: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #435dd8;
+  color: white;
+}
 
+#container {
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: calc(100vh - 50px);
+}
 
-/* Réinitialisation du margin et padding */
-* {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+#single-view, #split-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 
-    /* Le body prend toute la taille de la fenêtre sans marge */
-    body, html {
-      height: 100%;
-    }
+#split-view {
+  display: flex;
+}
 
-    #container {
-      position: absolute; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
-      width: 100%;
-      height: 100%;
-    }
+.panel {
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+}
 
-    #deck-canvas {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
+.deck-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 
+.chart-panel {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  width: 200px;
+  height: 200px;
+}
 
-    #slider-container {
-      display: flex;
-      flex-direction: column;
-      padding: 0 20px;
-      margin-top: 10px;
-      gap: 8px;
-      width: 220px;
-      font-family: Poppins;
-      font-size: 14px;
-      color: white;
-    }
-    
-    .slider-label {
-      font-weight: 500;
-      margin-bottom: 4px;
-      font-family: Poppins;
-      font-size: 13px;
-    }
-    
-    .slider-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    #point-slider {
-      flex: 1;
-      max-width: 160px;
-    }
-    
-    #slider-value {
-      min-width: 30px;
-      text-align: right;
-      font-weight: 600;
-    }
-    
-    
-    #slider-container h3 {
-      margin: 8px 0 4px 0; /* top, right, bottom, left */
-      font-size: 14px;
-      
-      font-weight: 500;
-      color: white;
-      font-family: Poppins;
-    }
-    
+/* Controls styling for single and split */
+.layer-controls {
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  color: #fff;
+  gap: 20px;
+  margin-top: 20px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.layer-controls * {
+  box-sizing: border-box;
+  padding: 0;
+  margin-left: 25px;
+}
+
+.layer-controls label {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 20px;
+  width: 220px;
+  cursor: pointer;
+  height: 50px;
+  position: relative;
+}
+
+.layer-controls label::before {
+  position: absolute;
+  content: "";
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 45px;
+  z-index: -1;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+
+.layer-controls label:hover::before {
+  background-color: #2a2e3c;
+}
+
+.layer-controls .label:has(input:checked)::before {
+  background-color: #2d3750;
+  border-color: #435dd8;
+  height: 50px;
+}
+
+.layer-controls .label input[type="radio"] {
+  background-color: #202030;
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.layer-controls .label input[type="radio"]:checked {
+  background-color: #435dd8;
+  animation: pulse 0.7s forwards;
+}
+
+.layer-controls .label input[type="radio"]::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #fff;
+  transform: scale(0);
+  transition: transform 0.1s ease;
+}
+
+.layer-controls .label input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+
+/* Slider container styling */
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  margin-top: 10px;
+  gap: 8px;
+  width: 220px;
+  font-size: 14px;
+  color: white;
+}
+
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-container input[type="range"] {
+  flex: 1;
+  max-width: 160px;
+}
+
+.slider-container span {
+  min-width: 30px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Tooltip */
+.deck-tooltip {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.9em;
+  background-color: #333 !important;
+  color: #fff !important;
+  padding: 6px;
+  border-radius: 4px;
+}

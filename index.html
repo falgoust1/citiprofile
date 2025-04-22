@@ -1,76 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>DeckGL / Citiprofile</title>
-  <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
+  <title>Visualisation CSV avec Deck.gl</title>
+  
+  <!-- Chargement de D3 pour la lecture du CSV -->
+  <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
+  
+  <!-- Chargement de Deck.gl -->
+  <script src="https://unpkg.com/deck.gl@^8.7.0/dist.min.js"></script>
+  
+  <!-- Chargement de MapLibre pour le fond de carte -->
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
-  <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" /> 
-  <link rel="stylesheet" href="style.css">
-    
+  <link
+    href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css"
+    rel="stylesheet"
+  />
+  
+  <style>
+    /* Pour occuper tout l'espace disponible */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    /* DeckGL va se superposer sur toute la page */
+    #deck-canvas {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
+  <!-- Conteneur principal -->
   <div id="container">
-
-    <!-- Contrôles pour la sélection des couches -->
-    <div id="layer-controls">
-      
-      <label class="label">
-        <input type="radio" name="layer" id="radio-scatter"> Scatterplot
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-grid" checked> GridExtrude
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-heat"> Heatmap
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-hex"> Hexbin 3D
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-screen"> ScreenGrid
-      </label>
-      <label class="label">
-        <input type="radio" name="layer" id="radio-poly"> Bâtiments en 3D
-      </label>
-      <div id="slider-container">
-        <h3> Maximum de points par bâtiment :</h3>
-        <div class="slider-wrapper">
-          <input type="range" id="point-slider" min="0" max="200" value="200">
-          <span id="slider-value">200</span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Le Canvas de DeckGL -->
+    <!-- L'élément où Deck.gl dessine la carte -->
     <div id="deck-canvas"></div>
-    
   </div>
 
-
-
-
-     <!--Configurer le titre et bandeau du démonstrateur--> 
-     <div id="header">
-      <div id="header-left">
-        <span class="bold-text">Rennes</span> 
-        <button type="button" id="accueil">Réinitialiser</button>
-        <span class="white-text italic-text" id="quartier-nom"></span>
-      </div>
-    
-      <div id="header-right">
-        <label class="toggle-switch">
-          <input type="checkbox" id="map-toggle">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-  
- 
-
-
-
-  <script src="./script.js"></script>
+  <!-- Notre script principal -->
+  <script src="script.js"></script>
 </body>
 </html>

@@ -327,7 +327,7 @@ toggle.addEventListener('change', (e) => {
        // Exemple de couche GeoJsonLayer pour dessiner les quartiers de Rennes
        const quartiersLayer = new deck.GeoJsonLayer({
         id: 'quartiers-layer',
-        data: 'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/perimetres-des-12-quartiers-de-la-ville-de-accues/exports/geojson?lang=fr&timezone=Europe%2FBerlin',
+        data: 'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/perimetres-des-12-quartiers-de-la-ville-de-rennes/exports/geojson?lang=fr&timezone=Europe%2FBerlin',
         
         /* Options de style */
         stroked: true,                  // on dessine la bordure

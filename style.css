@@ -186,11 +186,17 @@ body {margin: 0; padding: 0;}
     #header-right {
       display: flex;
       align-items: center;
-      gap: 20px; /* Espace entre le toggle et le bouton */
+      gap: 10px; /* Espace entre le toggle et le bouton */
+    }
+
+    #header-right svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0; /* évite que les SVG rétrécissent */
+      fill: white;
     }
 
     .toggle-switch {
-      margin-right: 20px; /* Décale le toggle de 20px vers la gauche */
       display: flex;
       align-items: center;
       gap: 10px;
@@ -261,6 +267,11 @@ body {margin: 0; padding: 0;}
       font-size: 14px;
       color: white;
       margin-left: 20px; 
+  }
+
+  .toggle-icon {
+    width: 10px;
+    height: 10px;
   }
   
   .toggle-switch {

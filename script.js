@@ -108,6 +108,31 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
     sliderValue:  initialState.sliderValue
   };
 
+
+  // 1. Créer l'élément canvas pour l'histogramme
+  const histoCtx = document.getElementById(`${controlsPrefix}-hour-histogram`).getContext('2d');
+  const histoChart = new Chart(histoCtx, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0')), // '00' à '23'
+    datasets: [{
+      label: 'Points par heure',
+      data: new Array(24).fill(0),
+      backgroundColor: '#76c7c0'
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      x: { title: { display: true, text: 'Heure' } },
+      y: { beginAtZero: true, title: { display: true, text: 'Nombre de points' } }
+    },
+    plugins: {
+      legend: { display: false }
+    }
+  }
+});
+
   /*––– Donut –––*/
   const ctx = document.getElementById(donutId).getContext('2d');
   const chart = new Chart(ctx,{
@@ -321,6 +346,14 @@ updateView();
       pts.filter(p=>p.transp_kind===61).length
     ];
     chart.update();
+    
+    const hourlyCount = new Array(24).fill(0);
+    pts.forEach(p => {
+      const h = +p.hour;
+      if (h >= 0 && h < 24) hourlyCount[h]++;
+    });
+    histoChart.data.datasets[0].data = hourlyCount;
+    histoChart.update();
 
 
   }

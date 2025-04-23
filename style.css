@@ -203,17 +203,7 @@ input:checked + .slider:before {
   height: 100%;
 }
 
-/* CHART PANEL */
-#chart-panel-single,
-#chart-panel-left,
-#chart-panel-right {
-  position: absolute;
-  bottom: 20px;
-  left: 300px;
-  z-index: 1000;
-  width: 200px;
-  height: 200px;
-}
+
 
 /* Controls Panels Positioning */
 #layer-controls-single,
@@ -417,4 +407,39 @@ input:checked + .slider:before {
   border: 2px solid #435dd8;
   border-radius: 50%;
   box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+
+
+.chart-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  position: absolute;
+  bottom: 20px;
+  left: 400px;
+  z-index: 1000;
+  width: 520px; /* ou plus selon ton espace disponible */
+
+  height: 220px;
+}
+
+.chart-panel canvas {
+  width: 200px !important;
+  height: 200px !important;
+}
+
+#single-hour-histogram,
+#left-hour-histogram,
+#right-hour-histogram {
+  width: 300px !important;
+}
+
+#donut-left,
+#donut-right,
+#donut-single{
+  width: 15px;
+  height: 15px
 }

@@ -1,360 +1,420 @@
-/* GUUUUURRRRRWWWAAANNNNN EETTTTT MMMMOIIIIIIII*/
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
-body {margin: 0; padding: 0;}
-#container {width: 100vw; height: 100vh; z-index: 2;}
+#container {
+  position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
 
-            /* Conteneur pour les contrôles */
-                        #layer-controls {
-                              display: flex;
-                              flex-direction: column;
-                              font-size: 16px;
-                              color: #fff;
-                              font-family: Poppins;
-                              gap: 20px;
-                        }
-                        
-                        #layer-controls * {
-                              box-sizing: border-box;
-                              background-color: #212C35;
-                              border-radius: 8px;
-                              z-index: 2000;
-                              opacity: 0.8;
-                              left: 40px;
-                              top: 150px;
-                              padding: 0;
-                              margin: 0;
-                        }
-                        
-                        #layer-controls label {
-                              display: flex;
-                              align-items: center;
-                         
-                              gap: 15px;
-                              padding: 0px 20px;
-                              width: 220px;
-                              cursor: pointer;
-                              height: 50px;
-                              position: relative;
-                        }
-                        
-                        #layer-controls label::before {
-                              position: absolute;
-                              content: "";
-                              top: 50%;
-                              left: 50%;
-                              transform: translate(-50%, -50%);
-                              width: 220px;
-                              height: 45px;
-                              z-index: -1;
-                              transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                              border-radius: 10px;
-                              border: 2px solid transparent;
-                        }
-                        #layer-controls label:hover::before {
-                              transition: all 0.2s ease;
-                              height: 50px;
-                              background-color: #2a2e3c;
-                        }
-                        
-                        #layer-controls .label:has(input:checked)::before {
-                              background-color: #124E66;
-                              border-color: #435dd8;
-                              height: 50px;
-                              
-                        }
-                        #layer-controls .label .text {
-                              color: #fff;
-                              opacity: 1;
-                        }
-                        
-                        #layer-controls .label input[type="radio"] {
-                              background-color: #fff;
-                              appearance: none;
-                              width: 17px;
-                              height: 17px;
-                              border-radius: 50%;
-                              display: flex;
-                              justify-content: center;
-                              align-items: center;
-                              z-index: 1000;
-                        }
-                        #layer-controls .label input[type="radio"]:checked {
-                              background-color: #435dd8;
-                              -webkit-animation: puls 0.7s forwards;
-                              animation: pulse 0.7s forwards;
-                              
-                        }
-                        
-                        #layer-controls .label input[type="radio"]:before {
-                              content: "";
-                              width: 6px;
-                              height: 6px;
-                              border-radius: 50%;
-                              transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
-                              background-color: #fff;
-                              transform: scale(0);
-                              
-                        }
-                        
-                        #layer-controls .label input[type="radio"]:checked::before {
-                              transform: scale(1);
-                              
-                        }
-                        
-                        @keyframes pulse {
-                              0% {
-                              box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-                              }
-                              70% {
-                              box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
-                              }
-                              100% {
-                              box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-                              }
-                        }
+#deck-canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
-
-/* Réinitialisation du margin et padding */
-* {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    /* Le body prend toute la taille de la fenêtre sans marge */
-    body, html {
-      height: 100%;
-    }
-
-    #container {
-      position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
-      width: 100%;
-      height: 100%;
-      z-index: 3;
-    }
-
-    #deck-canvas {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-
-
-
-/* LLLLEEEESSSSS FFFFIIILLLLLLLLLLLLEEEESSSS*/
-
-
-
+/* HEADER */
 #header {
-      position: fixed;
-      top: 15px;
-      left: 40px;
-      right: 40px;
-      border-radius: 8px;
-      gap: 15px;
-      height: 8%;     /* ou la hauteur que tu souhaites */
-      z-index: 1001;    /* pour passer au-dessus de la carte */
-      background: #323B42;
-      opacity: 0.9;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      font-family: Poppins;
-      font-weight: bold;
-      font-size: 20px;
-      justify-content: space-between;/* espace entre le bloc de gauche et celui de droite */
-
-    }
-    
-    #header-left {
-      display: flex;
-      margin-left: 20px; /* Décale le toggle de 20px vers la gauche */
-
-      align-items: center;
-      gap: 30px;
-    }
-    
-
-
-    #header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px; /* Espace entre le toggle et le bouton */
-    }
-
-    .toggle-switch {
-      margin-right: 20px; /* Décale le toggle de 20px vers la gauche */
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: Poppins;
-      font-size: 14px;
-      color: white;
-      }
- 
-    
-    #header img {
-      height: 100%;
-      margin-right: 12000px;
-    }
-
-
-    #accueil {
-      background-color: #124E66; /* Choisir une couleur pour le bouton */
-      color: white;
-      padding: 5px 10px;
-      font-family: Poppins; 
-      font-size: 18px;
-      margin-right: 100%;
-      border: none;
-      border: white;
-      border-radius: 5px;
-      cursor: pointer;
-  }
-
-  #quartier-nom{
-      font-family: Poppins; 
-      font-size: 10px;
-  }
-
-  #accueil:hover {
-      background-color: #199b43; /* Couleur du bouton au survol */
-  }
-
-
-
-  
-
-/*changements de fonds de carte */
-
-#menu {
-      position: absolute;
-      top: 105px;
-      left: 260px;
-      background: #00335a;
-      padding: 18px; 
-      z-index: 1000;
-      border-radius: 5px;
-      box-shadow: 0 0 10px black;
-  }
-  
-  /* modifier la police du "label" */ 
-  
-  label.white-text {
-      color: white;
-      font-family: Poppins; 
-  }
-  
-  /* CSS relatif au toggle slider pour le changement de fond de carte */ 
-  
-  .toggle-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: Poppins;
-      font-size: 14px;
-      color: white;
-      margin-left: 20px; 
-  }
-  
-  .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
-  }
-  
-  .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-  }
-  
-  .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 24px;
-  }
-  
-  .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 4px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-  }
-  
-  input:checked + .slider {
-      background-color: #2b2b2b;
-  }
-  
-  input:checked + .slider:before {
-      transform: translateX(26px);
-  }
-
-
-
- #slider-container {
-  margin-top: 150px; /* Un peu plus d'espace entre les contrôles radio et le slider */
-  margin-left: 40px;
-  padding: 0 20px;
+  position: fixed;
+  top: 15px;
+  left: 40px;
+  right: 40px;
+  border-radius: 8px;
+  gap: 15px;
+  height: 8%;     /* ou la hauteur que tu souhaites */
+  z-index: 1001;    /* pour passer au-dessus de la carte */
+  background: #323B42;
+  opacity: 0.9;
+  color: rgb(255, 255, 255);
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 220px;
+  align-items: center;
+  padding: 10px;
+  font-family: Poppins;
+
+  font-size: 20px;
+  justify-content: space-between;/* espace entre le bloc de gauche et celui de droite */
+}
+
+#header-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+
+
+#header-logo {
+  display: flex;
+  align-items:center;
+  gap: 0px;
+  white-space: nowrap;
+  color: rgb(255, 255, 255);
+  font-size: 6px;
+  margin-left: 0px;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: Poppins;
+  font-size: 36px;
+}
+
+#header img {
+  max-height: 50px;
+  margin-left: 26px;
+  margin-top: 3px;  
+}
+
+#header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espace entre le toggle et le bouton */
+}
+
+#header-right svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0; /* évite que les SVG rétrécissent */
+  fill: white;
+}
+
+#header button {
+  background-color: #124E66; /* Choisir une couleur pour le bouton */
+  color: white;
+  padding: 5px 10px;
+  font-family: Poppins; 
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#header button:hover {
+  background-color: #199b43; /* Couleur du bouton au survol */
+}
+
+
+ /* CSS relatif au toggle slider pour le changement de fond de carte */ 
+  
+ .toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family: Poppins;
   font-size: 14px;
   color: white;
-  
+  margin-left: 20px; 
 }
-    
-    .slider-label {
-      font-weight: 500;
-      margin-bottom: 4px;
-      font-family: Poppins;
-      font-size: 13px;
-    }
-    
-    .slider-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    #point-slider {
-      flex: 1;
-      max-width: 160px;
-    }
-    
-    #slider-value {
-      min-width: 30px;
-      text-align: right;
-      font-weight: 600;
-    }
-    
-    
-    #slider-container h3 {
-      margin: 8px 0 4px 0; /* top, right, bottom, left */
-      font-size: 14px;
-      
-      font-weight: 500;
-      color: white;
-      font-family: Poppins;
-    }
+
+.toggle-icon {
+width: 10px;
+height: 10px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2b2b2b;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+
+
+/* SINGLE VIEW & SPLIT VIEW CONTAINERS */
+#single-view,
+#split-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#split-view {
+  display: flex;
+}
+
+.panel {
+  width: 50%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* DECK CANVAS */
+#deck-canvas-single,
+#canvas-left,
+#canvas-right {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* CHART PANEL */
+#chart-panel-single,
+#chart-panel-left,
+#chart-panel-right {
+  position: absolute;
+  bottom: 20px;
+  left: 300px;
+  z-index: 1000;
+  width: 200px;
+  height: 200px;
+}
+
+/* Controls Panels Positioning */
+#layer-controls-single,
+#controls-left {
+  position: absolute;
+  top: 15%;
+  border-radius: 8px;
+  max-width: 460px;
+  left: 40px;
+  z-index: 1000;
+}
+
+#controls-right {
+  position: absolute;
+  top: 20%;
+  right: 40px;
+  z-index: 1000;
+}
+
+/* TOOLTIP */
+.deck-tooltip {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.9em;
+  background-color: #333 !important;
+  color: #fff !important;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+/* OVERRIDE: .layer-controls & .slider-container styling */
+.layer-controls {
+  position: absolute;
+  top: 20px;        /* ou 50px si vous voulez partir sous le header */
+  left: 20px;
+  bottom: 20px;     /* étire jusqu’à 20px du bas de l’écran */
+  width: 300px;    /* ou la largeur que vous souhaitez */
+  background: rgba(38, 41, 44, 0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  border-radius: 8px;
+  padding: 10px;
+  overflow-y: auto; /* scroll si trop long */
+  z-index: 1000;
+  color: #ffffffff
+}
+
+.layer-controls label {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 20px;
+  width: 220px;
+  cursor: pointer;
+  height: 50px;
+  position: relative;
+}
+
+.layer-controls label::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 45px;
+  z-index: -1;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.layer-controls label:hover::before {
+  background-color: #2a2e3c;
+}
+
+.layer-controls label:has(input:checked)::before {
+  background-color: #2d3750;
+  border-color: #435dd8;
+}
+
+.layer-controls input[type="radio"] {
+  background-color: #afafb3;
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.layer-controls input[type="radio"]:checked {
+  background-color: #858585;
+  animation: pulse 0.7s forwards;
+}
+
+.layer-controls input[type="radio"]::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #fff;
+  transform: scale(0);
+  transition: transform 0.1s ease;
+  position: absolute;
+}
+
+.layer-controls input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+
+.slider-container {
+  background: rgba(33, 44, 53, 0.8);
+  border-radius: 8px;
+  padding: 8px 20px;
+  margin-top: 10px;
+  width: 220px;
+  color: white;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.slider-container h3 {
+  margin: 8px 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-container input[type="range"] {
+  flex: 1;
+  max-width: 160px;
+}
+
+.slider-container span {
+  min-width: 30px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------
+   Styles pour les filtres temporels (mois, jours, heures)
+   ------------------------------------------------------- */
+
+/* groupement des cases à cocher */
+.slider-container .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* chaque label de checkbox */
+.slider-container .checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 60px;
+}
+
+/* espace entre checkbox et texte */
+.slider-container .checkbox-group label input {
+  margin-right: 4px;
+}
+
+/* noUiSlider : conteneur du slider */
+.noUi-target {
+  margin: 10px 0;
+}
+
+/* rail du slider */
+.noUi-horizontal {
+  height: 6px;
+  border-radius: 3px;
+  background: #435dd8;
+}
+
+/* portion “connectée” */
+.noUi-horizontal .noUi-connect {
+  background: #76c7c0;
+}
+
+/* poignée de contrôle */
+.noUi-origin .noUi-handle {
+  width: 14px;
+  height: 14px;
+  top: -4px;
+  background: #fff;
+  border: 2px solid #435dd8;
+  border-radius: 50%;
+  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}

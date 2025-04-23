@@ -9,7 +9,8 @@ const {
   HeatmapLayer,
   HexagonLayer,
   DataFilterExtension,
-  GeoJsonLayer
+  GeoJsonLayer,
+  FlyToInterpolator
 } = deck;
 
 // Global flags, data and instance storage
@@ -244,16 +245,27 @@ updateView();
     if(state.filters.pied)     pts.push(...geo.piedPts);
     if(state.filters.vehicule) pts.push(...geo.vehiculePts);
   
-    if(state.filters.months.length===0||state.filters.daysOfWeek.length===0){ pts=[]; }
-    else{
-      pts=pts.filter(d=>{
+    if(state.filters.months.length === 0 || state.filters.daysOfWeek.length === 0){
+      pts = [];
+    } else {
+      pts = pts.filter(d => {
         const m = +d.month;
-        if(state.filters.months.length && !state.filters.months.includes(m)) return false;
-        const w = (''+d.day_of_week).trim();
-        if(state.filters.daysOfWeek.length && !state.filters.daysOfWeek.includes(w)) return false;
+        const w = ('' + d.day_of_week).trim();
         const h = +d.hour;
-        return h>=state.filters.hours[0] && h<=state.filters.hours[1];
+        return (
+          state.filters.months.includes(m) &&
+          state.filters.daysOfWeek.includes(w) &&
+          h >= state.filters.hours[0] &&
+          h <= state.filters.hours[1]
+        );
       });
+    
+      // 🔥 Et seulement ensuite : filtrage spatial si un quartier est sélectionné
+      if (selectedQuartierPolygon) {
+        pts = pts.filter(pt =>
+          turf.booleanPointInPolygon([pt.lon, pt.lat], selectedQuartierPolygon)
+        );
+      }
     }
   
     const quartiersLayer = new deck.GeoJsonLayer({
@@ -282,18 +294,18 @@ updateView();
           const centroid = turf.centroid(selectedQuartierPolygon);
           const [longitude, latitude] = centroid.geometry.coordinates;
   
-          currentViewState = {
-            ...currentViewState,
+          const newViewState = {
+            ...state.viewState,
             longitude,
             latitude,
             zoom: 13.5,
             transitionDuration: 500,
             transitionInterpolator: new FlyToInterpolator(),
           };
+          state.viewState = newViewState;
+          deckgl.setProps({ viewState: newViewState });
   
-          deckgl.setProps({ viewState: currentViewState });
-  
-          updateLayer(); // ⚠️ Mets à jour ta logique si cette fonction existe
+          updateView(); // 👈 ça déclenchera le filtrage immédiat 
         }
       }
     });
@@ -309,6 +321,8 @@ updateView();
       pts.filter(p=>p.transp_kind===61).length
     ];
     chart.update();
+
+
   }
 
   return { deckgl, chart, state };

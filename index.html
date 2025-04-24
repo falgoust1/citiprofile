@@ -27,6 +27,8 @@
 
   <link rel="stylesheet" href="style.css">
 </head>
+
+
 <body>
 
   <!-- HEADER -->
@@ -82,6 +84,16 @@
           <label class="label">
             <input type="radio" name="layer-single" id="radio-heat-single"> Heatmap
           </label>
+            <h3>Threshold de la heatmap :</h3>
+            <div class="slider-wrapper">
+              <input type="range" id="threshold-slider" min="0" max="1" step="0.01" value="0.03">
+              <span id="threshold-value">0.03</span>
+            </div>
+            <h3>Rayon de la heatmap :</h3>
+            <div class="slider-wrapper">
+              <input type="range" id="radius-slider" min="10" max="100" value="30">
+              <span id="radius-value">30</span>
+            </div>
           <label class="label">
             <input type="radio" name="layer-single" id="radio-hex-single"> Hexbin 3D
           </label>

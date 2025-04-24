@@ -22,6 +22,8 @@ let syncingView  = false;
 const instances = {};
 
 let sliderValue = 1000; // Valeur du filtre par défaut
+let heatmapThreshold = 0.03;
+let heatmapRadius = 30;
 let selectedQuartierPolygon = null;
 
 // Default initial state for single view
@@ -170,6 +172,12 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
     viewState: state.viewState,
     onViewStateChange: ({viewState})=>{
       state.viewState = viewState;
+       // Ajout : si on a un quartier sélectionné ET qu'on dézoome sous le seuil, on réinitialise le filtre spatial
+    if (selectedQuartierPolygon && viewState.zoom < 13) {
+      selectedQuartierPolygon = null;
+      updateView(); // recharge les données sans filtre spatial
+      document.querySelector('#quartier-nom').textContent = ''; // supprime le nom du quartier affiché
+    }
        /* ---- synchronisation miroir ---- */
     if (isSplit && mirrorEnabled && !syncingView) {
       const other = container.includes("left") ? "right"
@@ -189,6 +197,27 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
   });
 
       attachControlListeners(controlsPrefix, state, updateView);
+
+      const thresholdSlider = document.getElementById('threshold-slider');
+      const radiusSlider = document.getElementById('radius-slider');
+      const thresholdValueEl = document.getElementById('threshold-value');
+      const radiusValueEl = document.getElementById('radius-value');
+
+      if (thresholdSlider) {
+        thresholdSlider.addEventListener('input', e => {
+          heatmapThreshold = parseFloat(e.target.value);
+          thresholdValueEl.textContent = heatmapThreshold.toFixed(2);
+          updateView(); // recharge la carte
+        });
+      }
+
+  if (radiusSlider) {
+    radiusSlider.addEventListener('input', e => {
+      heatmapRadius = parseInt(e.target.value);
+      radiusValueEl.textContent = heatmapRadius;
+      updateView(); // recharge la carte
+    });
+  }
 
       const mapSelect = document.getElementById('map-style-select');
 
@@ -414,16 +443,16 @@ hourSliderEl.noUiSlider.on('update', (v, handle) => {
 /** Build DeckGL layer **/
 function buildLayer(type, data, slider) {
   switch(type){
-    case 'scatter': return new ScatterplotLayer({ 
-      id:'ScatterplotLayer', 
-      data, 
-      radiusMinPixels:3, 
-      radiusMaxPixels:50, 
-      getRadius:1, 
-      radiusUnits:'pixels', 
-      getFillColor:d=>d.prixm2>4000?[202,0,32]:d.prixm2>3000?[244,165,130]:d.prixm2>2000?[146,197,222]:[5,113,176], 
-      getPosition:d=>[d.lon,d.lat], 
-      opacity:0.7 });
+    case 'scatter': return new ScatterplotLayer({
+      id: 'ScatterplotLayer',
+      data,
+      radiusMinPixels: 1.4,
+      radiusMaxPixels: 50,
+      getRadius: 1,
+      radiusUnits: 'pixels',
+      getFillColor: d => d.transp_kind === 60 ? [255, 0, 0] : [0, 0, 255],
+      getPosition: d => [d.lon, d.lat],
+      opacity: 0.7 });
     case 'grid':    return new GridLayer({ id:'GridLayer', 
       data, 
       cellSize:100, 
@@ -436,11 +465,13 @@ function buildLayer(type, data, slider) {
       opacity:1, 
       pickable:true, 
       colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
-    case 'heat':    return new HeatmapLayer({ 
-      id:'HeatmapLayer', 
-      data, radiusPixels:50, 
-      threshold:0.5, 
-      getPosition:d=>[d.lon,d.lat] });
+    case 'heat': return new HeatmapLayer({
+      id: 'HeatmapLayer',
+      data,
+      getPosition: d => [d.lon, d.lat],
+      getWeight: d => d.value || 1,
+      radiusPixels: heatmapRadius,
+      threshold: heatmapThreshold });
     case 'hex':     return new HexagonLayer({ 
       id:'HexagonLayer', 
       data, 
@@ -484,10 +515,6 @@ function buildLayer(type, data, slider) {
     }
   }
   
-
-
-
-
 
 
 

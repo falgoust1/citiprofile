@@ -581,3 +581,26 @@ function exitSplit(){
  
 
 }
+
+// À placer à la fin de script.js ou dans un fichier séparé exportPdf.js
+document.getElementById('btn-export-pdf').addEventListener('click', () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: 'a4' });
+
+  const canvas = instances.single.deckgl.canvas;
+
+  const imgData = canvas.toDataURL('image/png');
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
+  const imgWidth = pageWidth;
+  const imgHeight = pageWidth * canvas.height / canvas.width;
+
+  const x = 0;
+  const y = (pageHeight - imgHeight) / 2;
+
+  pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+  pdf.save('map.pdf');
+});
+

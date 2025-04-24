@@ -443,3 +443,18 @@ body.dark-mode .legend-container {
 }
 
 
+#btn-export-pdf {
+  background-color: #124E66;
+  color: white;
+  padding: 5px 10px;
+  font-family: Poppins;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#btn-export-pdf:hover {
+  background-color: #199b43;
+}

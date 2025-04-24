@@ -5,7 +5,8 @@
     "icgc-orto": {
       "type": "raster",
       "tiles": [
-        "https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/orto/MON3857NW/{z}/{x}/{y}.png"
+        "https://www.google.com/maps/vt?lyrs=s@180&gl=cn&x={x}&y={y}&z={z}"
+
       ],
       "tileSize": 256,
       "attribution": "© Institut Cartogràfic i Geològic de Catalunya"

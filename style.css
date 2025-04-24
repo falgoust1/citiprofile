@@ -9,47 +9,121 @@ body, html {
 }
 
 #container {
+  position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
+#deck-canvas {
+  width: 100%;
+  height: 100%;
   position: absolute;
-  top: 50px; /* espace sous le header */
-  bottom: 0;
+  top: 0;
   left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-  height: calc(100vh - 50px);
 }
 
 /* HEADER */
 #header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50px;
+  top: 15px;
+  left: 40px;
+  right: 40px;
+  border-radius: 8px;
+  gap: 15px;
+  height: 8%;     /* ou la hauteur que tu souhaites */
+  z-index: 1001;    /* pour passer au-dessus de la carte */
   background: #323B42;
+  opacity: 0.9;
+  color: rgb(255, 255, 255);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 1001;
+  padding: 10px;
+  font-family: Poppins;
+
+  font-size: 20px;
+  justify-content: space-between;/* espace entre le bloc de gauche et celui de droite */
 }
 
-#header-left .bold-text {
-  font-weight: 600;
-  color: white;
-  margin-right: 20px;
+#header-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+
+
+#header-logo {
+  display: flex;
+  align-items:center;
+  gap: 0px;
+  white-space: nowrap;
+  color: rgb(255, 255, 255);
+  font-size: 6px;
+  margin-left: 0px;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: Poppins;
+  font-size: 36px;
+}
+
+#header img {
+  max-height: 50px;
+  margin-left: 26px;
+  margin-top: 3px;  
+}
+
+#header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espace entre le toggle et le bouton */
+}
+
+#header-right svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0; /* évite que les SVG rétrécissent */
+  fill: white;
 }
 
 #header button {
-  margin-right: 10px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background: #435dd8;
+  background-color: #124E66; /* Choisir une couleur pour le bouton */
   color: white;
+  padding: 5px 10px;
+  font-family: Poppins; 
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border: white;
+  border-radius: 5px;
+  cursor: pointer;
 }
+
+#header button:hover {
+  background-color: #199b43; /* Couleur du bouton au survol */
+}
+
+
+/*  Gestion fond de carte */
+.map-select {
+  background-color: #124E66;
+  color: white;
+  padding: 6px 12px;
+  font-family: Poppins;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.map-select:hover {
+  background-color: #199b43;
+}
+
+
+
 
 /* SINGLE VIEW & SPLIT VIEW CONTAINERS */
 #single-view,
@@ -86,31 +160,23 @@ body, html {
   height: 100%;
 }
 
-/* CHART PANEL */
-#chart-panel-single,
-#chart-panel-left,
-#chart-panel-right {
-  position: absolute;
-  bottom: 20px;
-  left: 300px;
-  z-index: 1000;
-  width: 200px;
-  height: 200px;
-}
+
 
 /* Controls Panels Positioning */
 #layer-controls-single,
 #controls-left {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 15%;
+  border-radius: 8px;
+  max-width: 460px;
+  left: 40px;
   z-index: 1000;
 }
 
 #controls-right {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 20%;
+  right: 40px;
   z-index: 1000;
 }
 
@@ -130,15 +196,14 @@ body, html {
   top: 20px;        /* ou 50px si vous voulez partir sous le header */
   left: 20px;
   bottom: 20px;     /* étire jusqu’à 20px du bas de l’écran */
-  width: 240px;     /* ou la largeur que vous souhaitez */
+  width: 300px;    /* ou la largeur que vous souhaitez */
   background: rgba(38, 41, 44, 0.95);
-  border: 1px solid #435dd8;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   border-radius: 8px;
   padding: 10px;
   overflow-y: auto; /* scroll si trop long */
-  color: #ffffffff;
   z-index: 1000;
+  color: #ffffffff
 }
 
 .layer-controls label {
@@ -300,3 +365,81 @@ body, html {
   border-radius: 50%;
   box-shadow: 0 0 2px rgba(0,0,0,0.5);
 }
+
+
+
+.chart-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  position: absolute;
+  bottom: 20px;
+  left: 400px;
+  z-index: 1000;
+  width: 520px; /* ou plus selon ton espace disponible */
+
+  height: 220px;
+}
+
+.chart-panel canvas {
+  width: 200px !important;
+  height: 200px !important;
+}
+
+#single-hour-histogram,
+#left-hour-histogram,
+#right-hour-histogram {
+  width: 300px !important;
+}
+
+#donut-left,
+#donut-right,
+#donut-single{
+  width: 15px;
+  height: 15px
+}
+
+
+.legend-container {
+  position: fixed;
+  bottom: 40px;
+  right: 20px;
+  z-index: 1000;
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Poppins, sans-serif;
+  font-size: 13px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.legend-gradient {
+  width: 120px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(to right, rgb(1,152,189), rgb(73,227,206), rgb(216,254,181), rgb(254,237,177), rgb(254,173,84), rgb(209,55,78));
+}
+
+.legend-label {
+  white-space: nowrap;
+}
+
+/* Mode clair */
+body:not(.dark-mode) .legend-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+}
+
+/* Mode sombre */
+body.dark-mode .legend-container {
+  background-color: rgba(20, 20, 20, 0.9);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,0.1);
+}
+
+

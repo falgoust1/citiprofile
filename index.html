@@ -6,6 +6,7 @@
 
   <!-- Deck.gl & MapLibre -->
   <script src="https://unpkg.com/deck.gl@^9.0.0/dist.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
 
@@ -31,12 +32,29 @@
   <!-- HEADER -->
   <div id="header">
     <div id="header-left">
-      <span class="bold-text">Rennes</span>
+      <a id="header-logo" href="/">
+        <img src="https://raw.githubusercontent.com/falgoust1/citiprofile/main/logo.png" alt="Logo">
+      </a> 
       <button id="btn-compare">Comparer</button>
       <button id="btn-single" style="display:none;">Carte unique</button>
+      <button id="btn-sync" style="display:none;">Miroir : off</button>
+      <span class="bold-text">RENNES</span>
+      <span class="white-text italic-text" id="quartier-nom"></span> 
     </div>
     <div id="header-right">
       <button id="btn-sync" style="display:none;">Miroir : off</button>
+     
+      
+      <!--Gestion fond de carte --> 
+      
+      <select id="map-style-select" class="map-select">
+        <option value="positron">Fond clair</option>
+        <option value="dark">Fond sombre</option>
+        <option value="satellite">Satellite</option>
+      </select>
+      
+      
+      
     </div>
   </div>
 
@@ -165,6 +183,7 @@
       <div id="deck-canvas-single" class="deck-canvas"></div>
       <div id="chart-panel-single" class="chart-panel">
         <canvas id="donut-single"></canvas>
+        <canvas id="single-hour-histogram"></canvas>
       </div>
     </div>
 
@@ -291,6 +310,7 @@
         <div id="canvas-left" class="deck-canvas"></div>
         <div id="chart-panel-left" class="chart-panel">
           <canvas id="donut-left"></canvas>
+          <canvas id="left-hour-histogram"></canvas>
         </div>
       </div>
 
@@ -414,11 +434,20 @@
         <div id="canvas-right" class="deck-canvas"></div>
         <div id="chart-panel-right" class="chart-panel">
           <canvas id="donut-right"></canvas>
+          <canvas id="right-hour-histogram"></canvas>
         </div>
       </div>
 
     </div>
   </div>
+
+
+  <div class="legend-container" id="legend-block" style="display: none;">
+    <span class="legend-label">Faible nombre de points</span>
+    <div class="legend-gradient"></div>
+    <span class="legend-label">Nombre important de points</span>
+  </div>
+  
 
   <script src="script.js"></script>
 </body>

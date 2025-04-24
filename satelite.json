@@ -1,24 +1,23 @@
 {
-    "version": 8,
-    "name": "Esri World Imagery",
-    "sources": {
-      "esri": {
-        "type": "raster",
-        "tiles": [
-          "https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/orto/MON3857NW/{z}/{x}/{y}.png"
-        ],
-        "tileSize": 256,
-        "attribution": "© Esri – Source: Esri, Maxar, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN"
-      }
-    },
-    "layers": [
-      {
-        "id": "esri-imagery",
-        "type": "raster",
-        "source": "esri",
-        "minzoom": 0,
-        "maxzoom": 19
-      }
-    ]
-  }
-  
+  "version": 8,
+  "name": "ICGC Orthophoto",
+  "sources": {
+    "icgc-orto": {
+      "type": "raster",
+      "tiles": [
+        "https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/orto/MON3857NW/{z}/{x}/{y}.png"
+      ],
+      "tileSize": 256,
+      "attribution": "© Institut Cartogràfic i Geològic de Catalunya"
+    }
+  },
+  "layers": [
+    {
+      "id": "icgc-orto-layer",
+      "type": "raster",
+      "source": "icgc-orto",
+      "minzoom": 0,
+      "maxzoom": 19
+    }
+  ]
+}

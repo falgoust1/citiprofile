@@ -1,6 +1,6 @@
 {
   "version": 8,
-  "name": "ICGC Orthophoto",
+  "name": "Image 2025",
   "sources": {
     "icgc-orto": {
       "type": "raster",
@@ -9,7 +9,7 @@
 
       ],
       "tileSize": 256,
-      "attribution": "© Institut Cartogràfic i Geològic de Catalunya"
+      "attribution": "© Google Maps"
     }
   },
   "layers": [

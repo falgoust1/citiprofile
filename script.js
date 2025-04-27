@@ -62,7 +62,7 @@ const defaultState = {
 };
 
 // Load geojson and initialize
-fetch("2milion.geojson")
+fetch("1milion.geojson")
   .then(res => res.json())
   .then(geojson => {
 
@@ -345,7 +345,7 @@ hourLabels.forEach(label => {
   label.style.marginTop = '4px';
   label.style.textAlign = 'center';
   label.style.fontSize = '13px';
-  label.style.color = 'white';
+  label.style.color = 'black';
   label.style.fontFamily = 'Poppins';
   hourSliderEl.appendChild(label);
 });

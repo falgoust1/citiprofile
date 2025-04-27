@@ -55,14 +55,15 @@ const defaultState = {
     voiture:  true,
     months: [],       // mois sélectionnés (1–12)
     daysOfWeek: [],   // jours sélectionnés (1=Lu…7=Di)
-    hours: [0, 23]    // plage d’heures
+    hours: [0, 23],
+    daysOfMonth: [1, 31]     
   },
   layerType: 'grid',
   sliderValue: 1000
 };
 
 // Load geojson and initialize
-fetch("1milion.geojson")
+fetch("1milion_ok.geojson")
   .then(res => res.json())
   .then(geojson => {
 
@@ -128,7 +129,9 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
       voiture:  initialState.filters.voiture,
       months:      [...initialState.filters.months],
       daysOfWeek:  [...initialState.filters.daysOfWeek],
-      hours:       [...initialState.filters.hours]
+      hours:       [...initialState.filters.hours],
+      daysOfMonth: [...initialState.filters.daysOfMonth],
+
     },
     layerType:    initialState.layerType,
     sliderValue:  initialState.sliderValue
@@ -362,6 +365,52 @@ hourSliderEl.noUiSlider.on('update', (v, handle) => {
 });
 
 
+/*––– Slider jours du mois –––*/
+const domSliderEl = document.getElementById(`dom-slider-${controlsPrefix}`);
+noUiSlider.create(domSliderEl, {
+  start: state.filters.daysOfMonth,   // [1, 31]
+  connect: true,
+  step: 1,
+  range: { min: 1, max: 31 },
+  format: { to: v => Math.round(v), from: v => +v }
+});
+
+// labels optionnels
+const domLabels = [document.createElement('div'), document.createElement('div')];
+domLabels.forEach(l => {
+  l.style.marginTop = '4px';
+  l.style.textAlign = 'center';
+  l.style.fontSize = '13px';
+  l.style.color = 'black';
+  l.style.position = 'absolute';
+  domSliderEl.appendChild(l);
+});
+
+domSliderEl.noUiSlider.on('update', vals => {
+  state.filters.daysOfMonth = vals.map(v => +v);
+  vals.forEach((v, i) => {
+    domLabels[i].textContent = v;
+    domLabels[i].style.left = `calc(${(v - 1) / 30 * 100}% - 10px)`;
+  });
+  onFiltersChange();
+});
+
+/*––– Reset –––*/
+document.getElementById(`reset-temporal-filters-${controlsPrefix}`)
+        .addEventListener('click', () => {
+          ['month-checkboxes', 'dow-checkboxes']
+            .forEach(id => setGroupChecked(`${id}-${controlsPrefix}`, false));
+
+          state.filters.months = [];
+          state.filters.daysOfWeek = [];
+
+          hourSliderEl.noUiSlider.set([0, 23]);
+          domSliderEl.noUiSlider.set([1, 31]);   // ← ajoute cette ligne
+          onFiltersChange();
+        });
+
+
+
   /*––– Reset –––*/
   document.getElementById(`reset-temporal-filters-${controlsPrefix}`)
           .addEventListener('click',()=>{
@@ -384,16 +433,19 @@ hourSliderEl.noUiSlider.on('update', (v, handle) => {
       pts = [];
     } else {
       pts = pts.filter(d => {
-        const m = +d.MM;
-        const w = ('' + d.day_of_week).trim();
-        const h = +d.hh;
+        const m    = +d.MM;              // mois (1-12)
+        const w    = ('' + d.day_of_week).trim(); // L, Ma, …
+        const h    = +d.hh;              // heure (0-23)
+        const dday = +d.JJ;              // 👈 nouveau : jour du mois (1-31)
+      
         return (
           state.filters.months.includes(m) &&
           state.filters.daysOfWeek.includes(w) &&
-          h >= state.filters.hours[0] &&
-          h <= state.filters.hours[1]
+          h    >= state.filters.hours[0]      && h    <= state.filters.hours[1] &&
+          dday >= state.filters.daysOfMonth[0] && dday <= state.filters.daysOfMonth[1]  // 👈 test JJ
         );
       });
+      
     
       // 🔥 Et seulement ensuite : filtrage spatial si un quartier est sélectionné
       if (selectedQuartierPolygon) {

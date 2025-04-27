@@ -1,307 +1,564 @@
-/* GUUUUURRRRRWWWAAANNNNN EETTTTT MMMMOIIIIIIII*/
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 
-body {margin: 0; padding: 0;}
-#container {width: 100vw; height: 100vh; z-index: 2;}
 
-            /* Conteneur pour les contrôles */
-                        #layer-controls {
-                              display: flex;
-                              flex-direction: column;
-                              font-size: 16px;
-                              color: #fff;
-                              font-family: Poppins;
-                              gap: 20px;
-                        }
-                        
-                        #layer-controls * {
-                              box-sizing: border-box;
-                              background-color: #01335A;
-                              border-radius: 8px;
-                              z-index: 2000;
-                              opacity: 0.8;
-                              left: 20px;
-                              top: 150px;
-                              padding: 0;
-                              margin: 0;
-                        }
-                        
-                        #layer-controls label {
-                              display: flex;
-                              align-items: center;
-                         
-                              gap: 15px;
-                              padding: 0px 20px;
-                              width: 220px;
-                              cursor: pointer;
-                              height: 50px;
-                              position: relative;
-                        }
-                        
-                        #layer-controls label::before {
-                              position: absolute;
-                              content: "";
-                              top: 50%;
-                              left: 50%;
-                              transform: translate(-50%, -50%);
-                              width: 220px;
-                              height: 45px;
-                              z-index: -1;
-                              transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                              border-radius: 10px;
-                              border: 2px solid transparent;
-                        }
-                        #layer-controls label:hover::before {
-                              transition: all 0.2s ease;
-                              height: 50px;
-                              background-color: #2a2e3c;
-                        }
-                        
-                        #layer-controls .label:has(input:checked)::before {
-                              background-color: #24D366;
-                              border-color: #435dd8;
-                              height: 50px;
-                              
-                        }
-                        #layer-controls .label .text {
-                              color: #fff;
-                              opacity: 1;
-                        }
-                        
-                        #layer-controls .label input[type="radio"] {
-                              background-color: #fff;
-                              appearance: none;
-                              width: 17px;
-                              height: 17px;
-                              border-radius: 50%;
-                              display: flex;
-                              justify-content: center;
-                              align-items: center;
-                              z-index: 1000;
-                        }
-                        #layer-controls .label input[type="radio"]:checked {
-                              background-color: #435dd8;
-                              -webkit-animation: puls 0.7s forwards;
-                              animation: pulse 0.7s forwards;
-                              
-                        }
-                        
-                        #layer-controls .label input[type="radio"]:before {
-                              content: "";
-                              width: 6px;
-                              height: 6px;
-                              border-radius: 50%;
-                              transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
-                              background-color: #fff;
-                              transform: scale(0);
-                              
-                        }
-                        
-                        #layer-controls .label input[type="radio"]:checked::before {
-                              transform: scale(1);
-                              
-                        }
-                        
-                        @keyframes pulse {
-                              0% {
-                              box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-                              }
-                              70% {
-                              box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
-                              }
-                              100% {
-                              box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-                              }
-                        }
-
-
-/* Réinitialisation du margin et padding */
-* {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    /* Le body prend toute la taille de la fenêtre sans marge */
-    body, html {
-      height: 100%;
-    }
-
-    #container {
-      position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
-      width: 100%;
-      height: 100%;
-      z-index: 3;
-    }
-
-    #deck-canvas {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
 
 
 
-/* LLLLEEEESSSSS FFFFIIILLLLLLLLLLLLEEEESSSS*/
+
+#container {
+  position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
+#deck-canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
 
 
+
+/* HEADER */
 #header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      gap: 15px;
-      height: 10%;     /* ou la hauteur que tu souhaites */
-      z-index: 1001;    /* pour passer au-dessus de la carte */
-      background: #00335a;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      font-family: Poppins;
-      font-weight: bold;
-      font-size: 20px;
-      justify-content: space-between;/* espace entre le bloc de gauche et celui de droite */
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  gap: 15px;
+  height: 6%;     /* ou la hauteur que tu souhaites */
+  z-index: 1001;    /* pour passer au-dessus de la carte */
+  color: #1C4568 ;
+  background: #fff;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-family: Poppins;
+  font-size: 16px;
+  justify-content: space-between;/* espace entre le bloc de gauche et celui de droite */
+}
 
-    }
-    
-    #header-left {
-      display: flex;
-      margin-left: 20px; /* Décale le toggle de 20px vers la gauche */
-
-      align-items: center;
-      gap: 30px;
-    }
-    
+#header-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
 
 
-    #header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px; /* Espace entre le toggle et le bouton */
-    }
+#header-logo {
+  display: flex;
+  align-items:center;
+  gap: 0px;
+  white-space: nowrap;
+  margin-left: 0px;
+  text-decoration: none;
+}
 
-    .toggle-switch {
-      margin-right: 20px; /* Décale le toggle de 20px vers la gauche */
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: Poppins;
-      font-size: 14px;
-      color: white;
-      }
- 
-    
-    #header img {
-      height: 100%;
-      margin-right: 12000px;
-    }
+#header img {
+  max-height: 50px;
+  margin-left: 26px;
+  margin-top: 3px;  
+}
 
+#header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espace entre le toggle et le bouton */
+  margin-right: 40px;
+}
 
-    #accueil {
-      background-color: #25d366; /* Choisir une couleur pour le bouton */
-      color: white;
-      padding: 5px 10px;
-      font-family: Poppins; 
-      margin-right: 100%;
-      border: none;
-      border: white;
-      border-radius: 5px;
-      cursor: pointer;
-  }
-
-  #quartier-nom{
-      font-family: Poppins; 
-      font-size: 10px;
-  }
-
-  #accueil:hover {
-      background-color: #199b43; /* Couleur du bouton au survol */
-  }
+#header-right svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0; /* évite que les SVG rétrécissent */
+  fill: white;
+}
 
 
 
+#header button {
+  color: #1C4568;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(158, 162, 174);
+  border-right-color: rgb(158, 162, 174);
+  border-bottom-color: rgb(158, 162, 174);
+  border-left-color: rgb(158, 162, 174);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  padding-top: 6px;
+  padding-right: 18px;
+  padding-left: 18px;
+  line-height: 18px;
+  background-color: transparent;
+  margin-left: 42px;
+  cursor: pointer;
+  overflow: visible;
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+  text-align: center;
+  align-items: center;
+}
+
+#header button:hover {
+  background-color: #199b43; /* Couleur du bouton au survol */
+}
+
+
+/*  Gestion fond de carte */
+.map-select {
+  color: #1C4568;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(158, 162, 174);
+  border-right-color: rgb(158, 162, 174);
+  border-bottom-color: rgb(158, 162, 174);
+  border-left-color: rgb(158, 162, 174);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  padding-top: 6px;
+  padding-right: 18px;
+  padding-left: 18px;
+  line-height: 18px;
+  background-color: #fff;
+  margin-left: 42px;
+  cursor: pointer;
+  overflow: visible;
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0px;
+  text-align: center;
+  align-items: center;
+}
+
+.map-select:hover {
+  background-color: #199b43;
+}
+
+
+#btn-export {
+  background-color: #124E66;
+  color: white;
+  padding: 6px 12px;
+  font-family: Poppins;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+
+/* SINGLE VIEW & SPLIT VIEW CONTAINERS */
+#single-view,
+#split-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#split-view {
+  display: flex;
+}
+
+.panel {
+  width: 50%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* DECK CANVAS */
+#deck-canvas-single,
+#canvas-left,
+#canvas-right {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+/* Controls Panels Positioning */
+#layer-controls-single,
+#controls-left {
+  left: auto;
+  right: 24px;
+  top: 24px;
+}
+
+#controls-right {
+  position: absolute;
+  top: 20%;
+  right: 40px;
+  z-index: 1000;
+}
+
+/* TOOLTIP */
+.deck-tooltip {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.9em;
+  background-color: #333 !important;
+  color: #fff !important;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+/* OVERRIDE: .layer-controls & .slider-container styling */
+
+
+.layer-controls label {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 20px;
+  width: 220px;
+  cursor: pointer;
+  height: 50px;
+  position: relative;
+}
+
+
+
+
+
+
+/* -------------------------------------------------------
+   Styles pour les filtres temporels (mois, jours, heures)
+   ------------------------------------------------------- */
+
+/* groupement des cases à cocher */
+.slider-container .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* chaque label de checkbox */
+.slider-container .checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 60px;
+}
+
+/* espace entre checkbox et texte */
+.slider-container .checkbox-group label input {
+  margin-right: 4px;
+}
+
+/* noUiSlider : conteneur du slider */
+.noUi-target {
+  margin: 10px 0;
+}
+
+/* rail du slider */
+.noUi-horizontal {
+  height: 6px;
+  border-radius: 3px;
+  background: #435dd8;
+}
+
+/* portion “connectée” */
+.noUi-horizontal .noUi-connect {
+  background: #76c7c0;
+}
+
+/* poignée de contrôle */
+.noUi-origin .noUi-handle {
+  width: 14px;
+  height: 14px;
+  top: -4px;
+  background: #fff;
+  border: 2px solid #435dd8;
+  border-radius: 50%;
+  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+
+
+.chart-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  position: absolute;
+  bottom: 20px;
+  left: 400px;
+  z-index: 1000;
+  width: 520px; /* ou plus selon ton espace disponible */
+  height: 220px;
+}
+
+.chart-panel canvas {
+  width: 200px !important;
+  height: 200px !important;
+}
+
+#single-hour-histogram,
+#left-hour-histogram,
+#right-hour-histogram {
+  width: 300px !important;
+}
+
+#donut-left,
+#donut-right,
+#donut-single{
+  width: 15px;
+  height: 15px
+}
+
+
+.legend-container {
+  position: fixed;
+  bottom: 40px;
+  right: 20px;
+  z-index: 1000;
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Poppins, sans-serif;
+  font-size: 13px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.legend-gradient {
+  width: 120px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(to right, rgb(1,152,189), rgb(73,227,206), rgb(216,254,181), rgb(254,237,177), rgb(254,173,84), rgb(209,55,78));
+}
+
+.legend-label {
+  white-space: nowrap;
+}
+
+/* Mode clair */
+body:not(.dark-mode) .legend-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+}
+
+/* Mode sombre */
+body.dark-mode .legend-container {
+  background-color: rgba(20, 20, 20, 0.9);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,0.1);
+}
+
+
+#btn-export-pdf {
+  background-color: #124E66;
+  color: white;
+  padding: 5px 10px;
+  font-family: Poppins;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#btn-export-pdf:hover {
+  background-color: #199b43;
+}
+
+
+
+
+
+
+#sidebar-buttons {
+  position: fixed;
+  top: 100px;
+  left: 15px;
+  background: rgb(251, 252, 254);
+  display: flex;
+  flex-direction: column;
+  z-index: 1200;
+  border-radius: 12px;
+  padding: 2px;
   
+}
 
-/*changements de fonds de carte */
+.sidebar-btn {
+  fill :rgb(158, 162, 174);
+  width: 56px;
+  height: 60px;
+  border-radius: 12px;
+  background-size: 60%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  cursor: pointer;
+  outline: 0px;
+  transition: background-color 0.2s;
+  border: medium;
+}
 
-#menu {
-      position: absolute;
-      top: 105px;
-      left: 260px;
-      background: #00335a;
-      padding: 18px; 
-      z-index: 1000;
-      border-radius: 5px;
-      box-shadow: 0 0 10px black;
-  }
+.sidebar-btn:hover {
+  background-color: #199b43;
+}
+
+.sidebar-btn:nth-child(1) {
+  background-image: url('https://www.svgrepo.com/show/532917/layer-group.svg');
   
-  /* modifier la police du "label" */ 
-  
-  label.white-text {
-      color: white;
-      font-family: Poppins; 
-  }
-  
-  /* CSS relatif au toggle slider pour le changement de fond de carte */ 
-  
-  .toggle-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: Poppins;
-      font-size: 14px;
-      color: white;
-      margin-left: 20px; 
-  }
-  
-  .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
-  }
-  
-  .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-  }
-  
-  .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 24px;
-  }
-  
-  .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 4px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-  }
-  
-  input:checked + .slider {
-      background-color: #2b2b2b;
-  }
-  
-  input:checked + .slider:before {
-      transform: translateX(26px);
-  }
+}
+.sidebar-btn:nth-child(2) {
+  background-image: url('https://www.svgrepo.com/show/532173/filter-xmark.svg'); /* Icône transports */
+}
+.sidebar-btn:nth-child(3) {
+  background-image: url('https://www.svgrepo.com/show/521888/time.svg'); /* Icône clock/temps */
+}
+
+.sidebar-panel {
+  position: relative;
+  flex-direction: column;
+  top: 100px;
+  left: 90px;
+  width: 359px;
+  max-height: calc(-115px + 100vh);
+  padding-bottom: 26px;
+  overflow-y: auto;
+  background-color: rgb(251, 252, 254);
+  border-radius: 8px;
+  padding: 20px;
+  z-index: 1200;
+  display: flex;
+  color: white;
+}
+
+.ChoixLayer {
+  font-family: inherit;
+  color: #124E66;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  margin-bottom: 10px;
+}
+
+.layer-group {
+  font-family: inherit;
+  font-size: 14px;
+  color: #124E66;
+}
+
+.TypeAgreg {
+  font-family: inherit;
+  color: #124E66;
+  font-size: 14px;
+}
+
+.NomFiltre{
+  font-family: inherit;
+  font-size: 12px;
+  color: #124E66;
+  margin-bottom: 5px;
+}
+
+/* level settings 👇 */
+
+.slider-wrapper {
+  /* slider */
+  --slider-width: 100%;
+  --slider-height: 6px;
+  --slider-bg: #1C4568;
+  --slider-border-radius: 999px;
+  /* level */
+  --level-color: grey;
+  --level-transition-duration: .1s;
+  /* icon */
+  --icon-margin: 15px;
+  --icon-color: var(--slider-bg);
+  --icon-size: 25px;
+}
+
+.slider-wrapper {
+  cursor: pointer;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+
+
+.slider-wrapper .level {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: var(--slider-width);
+  height: var(--slider-height);
+  background: var(--slider-bg);
+  overflow: hidden;
+  border-radius: var(--slider-border-radius);
+  -webkit-transition: height var(--level-transition-duration);
+  -o-transition: height var(--level-transition-duration);
+  transition: height var(--level-transition-duration);
+  cursor: inherit;
+}
+
+.slider-wrapper .level::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  -webkit-box-shadow: -200px 0 0 200px var(--level-color);
+  box-shadow: -200px 0 0 200px var(--level-color);
+}
+
+.slider-wrapper:hover .level {
+  height: calc(var(--slider-height) * 2);
+}

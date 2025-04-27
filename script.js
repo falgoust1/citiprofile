@@ -1,287 +1,655 @@
-const { DeckGL, ScatterplotLayer, ScreenGridLayer, GridLayer, HeatmapLayer, HexagonLayer,Slider, DataFilterExtension } = deck;
+// script.js
+
+// Import DeckGL layers and extensions
+const {
+  DeckGL,
+  ScatterplotLayer,
+  ScreenGridLayer,
+  GridLayer,
+  HeatmapLayer,
+  HexagonLayer,
+  DataFilterExtension,
+  GeoJsonLayer,
+  FlyToInterpolator
+} = deck;
+
+// Global flags, data and instance storage
+let isSplit = false;
+let mirrorEnabled = false;
+let globalGeo = null;
+let syncingView  = false;
+
+const instances = {};
+
+let sliderValue = 1000; // Valeur du filtre par défaut
+let heatmapThreshold = 0.03;
+let heatmapRadius = 30;
+let selectedQuartierPolygon = null;
+
+// Default initial state for single view
+const defaultState = {
+  viewState: {
+    longitude: -1.6992,
+    latitude: 48.1119,
+    zoom: 14,
+    pitch: 40,
+    bearing: 0
+  },
+  filters: {
+    pied: true,
+    vehicule: true,
+    months: [],       // mois sélectionnés (1–12)
+    daysOfWeek: [],   // jours sélectionnés (1=Lu…7=Di)
+    hours: [0, 23]    // plage d’heures
+  },
+  layerType: 'grid',
+  sliderValue: 1000
+};
+
+// Load geojson and initialize
+fetch("ZN_bat_60-61_w_IDs.geojson")
+  .then(res => res.json())
+  .then(geojson => {
+
+    // Extract points
+    const points = [];
+    geojson.features.forEach(f => {
+      const g = f.geometry;
+      if (!g || !g.coordinates) return;
+      if (g.type === 'MultiPoint') {
+        g.coordinates.forEach(coord => points.push({ lon: coord[0], lat: coord[1], ...f.properties }));
+      } else if (g.type === 'Point') {
+        const [lon, lat] = g.coordinates;
+        points.push({ lon, lat, ...f.properties });
+      }
+    });
+    points.forEach(d => d.transp_kind = Number(d.transp_kind));
+    const piedPts     = points.filter(d => d.transp_kind === 60);
+    const vehiculePts = points.filter(d => d.transp_kind === 61);
+
+    // Store global data
+    globalGeo = { piedPts, vehiculePts };
+
+    // Create single view instance
+    instances.single = createInstance({
+      container: 'deck-canvas-single',
+      controlsPrefix: 'single',
+      donutId: 'donut-single',
+      initialState: defaultState,
+      geo: globalGeo
+    });
+    toggleLegend(defaultState.layerType);
 
 
+    // Header buttons
+    document.getElementById('btn-compare').addEventListener('click', enterSplit);
+    document.getElementById('btn-single').addEventListener('click', exitSplit);
+    document.getElementById('btn-sync').addEventListener('click', () => {
+      mirrorEnabled = !mirrorEnabled;
+      document.getElementById('btn-sync').textContent = `Miroir : ${mirrorEnabled ? 'on' : 'off'}`;
+      if (mirrorEnabled && instances.left && instances.right) {
+        const vs = instances.left.state.viewState;
+        instances.right.deckgl.setProps({ viewState: vs });
+        instances.right.state.viewState = vs;
+      }
+    });
+  })
+  .catch(err => console.error("Erreur JSON:", err));
 
-// Charger le fichier JSON localement
-fetch("http://127.0.0.1:5500/ZN_bat_60-61_w_IDs.geojson")
-  .then(response => response.json())
-  .then((geojson) => {
-    
-// On va parcourir le FeatureCollection
-const points = [];
 
-for (const feature of geojson.features) {
-  const geom = feature.geometry;
+/** Create DeckGL + Chart + controls instance **/
+function createInstance({ container, controlsPrefix, donutId, initialState, geo }) {
+  const state = {
+    viewState: { ...initialState.viewState },
+    filters: {
+      pied:        initialState.filters.pied,
+      vehicule:    initialState.filters.vehicule,
+      months:      [...initialState.filters.months],
+      daysOfWeek:  [...initialState.filters.daysOfWeek],
+      hours:       [...initialState.filters.hours]
+    },
+    layerType:    initialState.layerType,
+    sliderValue:  initialState.sliderValue
+  };
 
-  // Par sécurité, vérifier qu'on a bien un geometry
-  if (!geom || !geom.coordinates) {
-    continue;
-  }
 
-  if (geom.type === 'MultiPoint') {
-    // Pour chaque coordonnée de MultiPoint
-    for (const coord of geom.coordinates) {
-      // coord = [lon, lat]
-      points.push({
-        lon: coord[0],
-        lat: coord[1],
-        // On peut aussi recopier des propriétés du feature si besoin
-        ...feature.properties
-      });
+  // 1. Créer l'élément canvas pour l'histogramme
+  const histoCtx = document.getElementById(`${controlsPrefix}-hour-histogram`).getContext('2d');
+  const histoChart = new Chart(histoCtx, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0')), // '00' à '23'
+    datasets: [{
+      label: 'Points par heure',
+      data: new Array(24).fill(0),
+      backgroundColor: '#073775'
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      x: {
+        // ... tes options de titre et ticks
+        grid: {
+          color: '#ffffff',  
+          opacity: 0,      // facultatif : couleur des lignes de fond
+          lineWidth: 2, 
+          display: false,         // ← ÉPAISSEUR des lignes
+        }
+      },
+      y: {
+        beginAtZero: true,
+        // ... titre et ticks
+        grid: {
+          color: '#ffffff',  
+          opacity: 0,
+          lineWidth: 2,
+          display: false,
+        }
+      }
     }
-  } else if (geom.type === 'Point') {
-    const [lon, lat] = geom.coordinates;
-    points.push({
-      lon,
-      lat,
-      ...feature.properties
+    ,
+    plugins: {
+      legend: { display: false }
+    }
+  }
+});
+
+  /*––– Donut –––*/
+  const ctx = document.getElementById(donutId).getContext('2d');
+  const chart = new Chart(ctx,{
+    type:'doughnut',
+    data:{ labels:['À pied','Véhicule'], datasets:[{ data:[0,0], backgroundColor:['#2daf45','#073775'] }]},
+    options:{ cutout:'60%', plugins:{ legend:{display:false}, datalabels:{ color:'#fff', formatter:(v,ctx)=>{ const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); return t?Math.round(v/t*100)+'%':''; }}}},
+    plugins:[ChartDataLabels]
+  });
+
+  /*––– DeckGL –––*/
+  const deckgl = new DeckGL({
+    container,
+    mapStyle:"https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
+    controller:true,
+    viewState: state.viewState,
+    onViewStateChange: ({viewState})=>{
+      state.viewState = viewState;
+       // Ajout : si on a un quartier sélectionné ET qu'on dézoome sous le seuil, on réinitialise le filtre spatial
+    if (selectedQuartierPolygon && viewState.zoom < 13) {
+      selectedQuartierPolygon = null;
+      updateView(); // recharge les données sans filtre spatial
+      document.querySelector('#quartier-nom').textContent = ''; // supprime le nom du quartier affiché
+    }
+       /* ---- synchronisation miroir ---- */
+    if (isSplit && mirrorEnabled && !syncingView) {
+      const other = container.includes("left") ? "right"
+                  : container.includes("right") ? "left"
+                  : null;
+
+      if (other && instances[other]) {
+        syncingView = true;                  // on inhibe le callback de l’autre carte
+        instances[other].deckgl.setProps({ viewState });
+        instances[other].state.viewState = viewState;
+        syncingView = false;
+      }
+    }
+      deckgl.setProps({ viewState });
+    },
+    layers:[]
+  });
+
+      attachControlListeners(controlsPrefix, state, updateView);
+
+      const thresholdSlider = document.getElementById('threshold-slider');
+      const radiusSlider = document.getElementById('radius-slider');
+      const thresholdValueEl = document.getElementById('threshold-value');
+      const radiusValueEl = document.getElementById('radius-value');
+
+      if (thresholdSlider) {
+        thresholdSlider.addEventListener('input', e => {
+          heatmapThreshold = parseFloat(e.target.value);
+          thresholdValueEl.textContent = heatmapThreshold.toFixed(2);
+          updateView(); // recharge la carte
+        });
+      }
+
+  if (radiusSlider) {
+    radiusSlider.addEventListener('input', e => {
+      heatmapRadius = parseInt(e.target.value);
+      radiusValueEl.textContent = heatmapRadius;
+      updateView(); // recharge la carte
     });
   }
-  // Si vous avez d'autres types (LineString, etc.), il faut aussi les gérer ou les ignorer
+
+      const mapSelect = document.getElementById('map-style-select');
+
+      const styleUrls = {
+        positron: 'https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json',
+        dark: 'https://openmaptiles.geo.data.gouv.fr/styles/dark-matter/style.json',
+        satellite: 'https://raw.githubusercontent.com/falgoust1/citiprofile/refs/heads/Gurwan/satelite.json'
+      };
+      
+      mapSelect.addEventListener('change', (e) => {
+        const newStyle = styleUrls[e.target.value];
+      
+        // single view
+        if (instances.single) {
+          instances.single.deckgl.setProps({ mapStyle: newStyle });
+        }
+      
+        // split views
+        if (instances.left) {
+          instances.left.deckgl.setProps({ mapStyle: newStyle });
+        }
+        if (instances.right) {
+          instances.right.deckgl.setProps({ mapStyle: newStyle });
+        }
+      
+        // Mode sombre automatique si dark
+        document.body.classList.toggle('dark-mode', e.target.value === 'dark');
+      });
+  
+
+
+
+
+
+
+
+
+
+  /*––– Helpers –––*/
+  const getCheckedMonths = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(e=>+e.value);
+  const getCheckedDays   = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(e=>e.value);
+  const setGroupChecked  = (id,check)=>document.querySelectorAll(`#${id} input`).forEach(cb=>cb.checked=check);
+  const attachToggleButton = (btn,id) =>{
+    if(!btn) return;
+    btn.addEventListener('click',()=>{
+      const boxes=document.querySelectorAll(`#${id} input`);
+      const all=Array.from(boxes).every(cb=>cb.checked);
+      setGroupChecked(id,!all);
+      btn.textContent = all?'Tout cocher':'Tout décocher';
+      state.filters.months     = id.startsWith('month') ? getCheckedMonths(id):state.filters.months;
+      state.filters.daysOfWeek = id.startsWith('dow')   ? getCheckedDays(id):state.filters.daysOfWeek;
+      onFiltersChange();
+    });
+  };
+
+  /*––– Listeners cases –––*/
+  document.querySelectorAll(`#month-checkboxes-${controlsPrefix} input`)
+          .forEach(cb=>cb.addEventListener('change',()=>{
+            state.filters.months=getCheckedMonths(`month-checkboxes-${controlsPrefix}`);
+            onFiltersChange();
+          }));
+  document.querySelectorAll(`#dow-checkboxes-${controlsPrefix} input`)
+          .forEach(cb=>cb.addEventListener('change',()=>{
+            state.filters.daysOfWeek=getCheckedDays(`dow-checkboxes-${controlsPrefix}`);
+            onFiltersChange();
+          }));
+
+  /*––– Boutons toggle –––*/
+  attachToggleButton(
+    document.querySelector(`.toggle-btn[data-target="month-checkboxes-${controlsPrefix}"]`),
+    `month-checkboxes-${controlsPrefix}`
+  );
+  attachToggleButton(
+    document.querySelector(`.toggle-btn[data-target="dow-checkboxes-${controlsPrefix}"]`),
+    `dow-checkboxes-${controlsPrefix}`
+  );
+
+  /*––– Slider heures –––*/
+  // valeurs cochées par défaut  ➜  on remplit d'emblée les filtres
+state.filters.months     = getCheckedMonths(`month-checkboxes-${controlsPrefix}`);
+state.filters.daysOfWeek = getCheckedDays  (`dow-checkboxes-${controlsPrefix}`);
+
+// rendu initial de la carte
+updateView();
+
+  const hourSliderEl = document.getElementById(`hour-slider-${controlsPrefix}`);
+  noUiSlider.create(hourSliderEl,{
+    start:state.filters.hours, connect:true, step:1, range:{min:0,max:23},
+    format:{ to:v=>Math.round(v), from:v=>+v }
+  });
+  // Crée des spans pour afficher les heures formatées
+const hourLabels = [document.createElement('div'), document.createElement('div')];
+hourLabels.forEach(label => {
+  label.style.marginTop = '4px';
+  label.style.textAlign = 'center';
+  label.style.fontSize = '13px';
+  label.style.color = 'white';
+  label.style.fontFamily = 'Poppins';
+  hourSliderEl.appendChild(label);
+});
+
+hourSliderEl.noUiSlider.on('update', (v, handle) => {
+  state.filters.hours = v.map(n => +n);
+  hourLabels.forEach((label, i) => {
+    label.textContent = `${Math.round(v[i])}h`;
+    const percent = (v[i] / 23) * 100;
+    label.style.position = 'absolute';
+    label.style.left = `calc(${percent}% - 10px)`; // centrer horizontalement
+  });
+  onFiltersChange();
+});
+
+
+  /*––– Reset –––*/
+  document.getElementById(`reset-temporal-filters-${controlsPrefix}`)
+          .addEventListener('click',()=>{
+            ['month-checkboxes','dow-checkboxes'].forEach(id=>setGroupChecked(`${id}-${controlsPrefix}`,false));
+            state.filters.months=[]; state.filters.daysOfWeek=[];
+            hourSliderEl.noUiSlider.set([0,23]);
+            onFiltersChange();
+          });
+
+  function onFiltersChange(){ updateView(); }
+
+  function updateView(){
+    let pts=[];
+    if(state.filters.pied)     pts.push(...geo.piedPts);
+    if(state.filters.vehicule) pts.push(...geo.vehiculePts);
+  
+    if(state.filters.months.length === 0 || state.filters.daysOfWeek.length === 0){
+      pts = [];
+    } else {
+      pts = pts.filter(d => {
+        const m = +d.month;
+        const w = ('' + d.day_of_week).trim();
+        const h = +d.hour;
+        return (
+          state.filters.months.includes(m) &&
+          state.filters.daysOfWeek.includes(w) &&
+          h >= state.filters.hours[0] &&
+          h <= state.filters.hours[1]
+        );
+      });
+    
+      // 🔥 Et seulement ensuite : filtrage spatial si un quartier est sélectionné
+      if (selectedQuartierPolygon) {
+        pts = pts.filter(pt =>
+          turf.booleanPointInPolygon([pt.lon, pt.lat], selectedQuartierPolygon)
+        );
+      }
+    }
+  
+    const quartiersLayer = new deck.GeoJsonLayer({
+      id: 'quartiers-layer',
+      data: 'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/perimetres-des-12-quartiers-de-la-ville-de-rennes/exports/geojson?lang=fr&timezone=Europe%2FBerlin',
+      stroked: true,
+      filled: true,
+      getLineColor: [37, 211, 102],
+      lineWidthMinPixels: 2,
+      getFillColor: [0, 0, 0, 0],
+      pickable: true,
+      autoHighlight: true,
+      highlightColor: [102, 205, 170, 70],
+      onHover: info => {
+        if (info.object) {
+          const nomQuartier = info.object.properties.nom;
+          document.querySelector('#quartier-nom').innerHTML = `<span style="padding-right: 16px;">|</span>Quartier ${nomQuartier}`;
+        }
+      },
+      onClick: info => {
+        if (info.object) {
+          const nomQuartier = info.object.properties.nom;
+          document.querySelector('#quartier-nom').textContent = `| Quartier ${nomQuartier}`;
+          selectedQuartierPolygon = info.object.geometry;
+  
+          const centroid = turf.centroid(selectedQuartierPolygon);
+          const [longitude, latitude] = centroid.geometry.coordinates;
+  
+          const newViewState = {
+            ...state.viewState,
+            longitude,
+            latitude,
+            zoom: 13.5,
+            transitionDuration: 500,
+            transitionInterpolator: new FlyToInterpolator(),
+          };
+          state.viewState = newViewState;
+          deckgl.setProps({ viewState: newViewState });
+  
+          updateView(); // 👈 ça déclenchera le filtrage immédiat 
+        }
+      }
+    });
+  
+    // Ajoute la couche des quartiers en plus de la couche principale
+    deckgl.setProps({ layers: [
+      buildLayer(state.layerType, pts, state.sliderValue),
+      quartiersLayer
+    ]});
+  
+    chart.data.datasets[0].data = [
+      pts.filter(p=>p.transp_kind===60).length,
+      pts.filter(p=>p.transp_kind===61).length
+    ];
+    chart.update();
+    
+    const hourlyCount = new Array(24).fill(0);
+    pts.forEach(p => {
+      const h = +p.hour;
+      if (h >= 0 && h < 24) hourlyCount[h]++;
+    });
+    histoChart.data.datasets[0].data = hourlyCount;
+    histoChart.update();
+
+
+  }
+
+  return { deckgl, chart, state };
 }
 
 
 
-// ViewState réactif
-let currentViewState = {
-  longitude: -1.6992,
-  latitude: 48.1119,
-  zoom: 14,
-  pitch: 50,
-  bearing: 0
-};
-
-
-
-    // Création de l'instance DeckGL après chargement des données
-    const deckgl = new DeckGL({
-      container: "deck-canvas", // ID du conteneur HTML
-      mapStyle: "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json", //Ajout du fond de carte
-      controller: true,
-      viewState: currentViewState,
-      onViewStateChange: ({ viewState }) => {
-        currentViewState = viewState;
-        deckgl.setProps({ viewState });
-      },
-      getTooltip: ({ object }) =>
-        object && `Nombre de points : ${object.points.length}`,
-      layers: [] // Pas de couche initial, on va l'ajouter apres
-    });
-
-
-
-
-
-
-
-
-
-
-//                 Partie pour le switch Clair / Foncé
-
-// Sélectionner le toggle switch
-const toggle = document.getElementById("map-toggle");
-
-
-// Écoute l’événement "change"
-toggle.addEventListener('change', (e) => {
-  if (e.target.checked) {
-    // Case cochée => style sombre
-    deckgl.setProps({
-      mapStyle: 'https://openmaptiles.geo.data.gouv.fr/styles/dark-matter/style.json' 
-    });
-  } else {
-    // Case décochée => style clair
-    deckgl.setProps({
-      mapStyle: 'https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json'
-    });
+/** Build DeckGL layer **/
+function buildLayer(type, data, slider) {
+  switch(type){
+    case 'scatter': return new ScatterplotLayer({
+      id: 'ScatterplotLayer',
+      data,
+      radiusMinPixels: 1.4,
+      radiusMaxPixels: 50,
+      getRadius: 1,
+      radiusUnits: 'pixels',
+      getFillColor: d => d.transp_kind === 60 ? [255, 0, 0] : [0, 0, 255],
+      getPosition: d => [d.lon, d.lat],
+      opacity: 0.7 });
+    case 'grid':    return new GridLayer({ id:'GridLayer', 
+      data, 
+      cellSize:100, 
+      coverage:0.8, 
+      extruded:true, 
+      getPosition:d=>[d.lon,d.lat], 
+      getElevationValue:pts=>pts.length, 
+      colorAggregation:'SUM', 
+      colorScaleType:'quantile', 
+      opacity:1, 
+      pickable:true, 
+      colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
+    case 'heat': return new HeatmapLayer({
+      id: 'HeatmapLayer',
+      data,
+      getPosition: d => [d.lon, d.lat],
+      getWeight: d => d.value || 1,
+      radiusPixels: heatmapRadius,
+      threshold: heatmapThreshold });
+    case 'hex':     return new HexagonLayer({ 
+      id:'HexagonLayer', 
+      data, 
+      getPosition:d=>[d.lon,d.lat], 
+      radius:50, 
+      coverage:0.8, 
+      extruded:true, 
+      getElevationValue:pts=>pts.length, 
+      colorAggregation:'SUM', 
+      colorScaleType:'quantile', 
+      opacity:0.8, 
+      pickable:true, 
+      colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
+    case 'screen':  return new ScreenGridLayer({ 
+      id:'ScreenGridLayer', 
+      data, 
+      cellSizePixels:20, 
+      opacity:0.8, 
+      getPosition:d=>[d.lon,d.lat], 
+      colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
+    case 'poly':    return new GeoJsonLayer({ 
+      id:'GeoJsonLayer', 
+      data:'https://raw.githubusercontent.com/falgoust1/citiprofile/Gurwan/bat6061s2.geojson', 
+      extruded:true, 
+      pickable:true, 
+      getPolygon:d=>d.geometry.coordinates, 
+      getElevation:d=>d.properties.HAUTEUR, 
+      getFillColor:d=>d.properties.nbpoints<10?[1,152,189]:d.properties.nbpoints<40?[216,254,181]:[209,55,78], 
+      getFilterValue:d=>d.properties.nbpoints, 
+      filterRange:[0,slider], 
+      extensions:[new DataFilterExtension({filterSize:1})] });
+    default:       return new ScatterplotLayer({ id:'empty', data:[] });
   }
+  }
+  function toggleLegend(layerType) {
+    const legend = document.getElementById('legend-block');
+    if (['grid', 'hex', 'screen'].includes(layerType)) {
+      legend.style.display = 'flex';
+    } else {
+      legend.style.display = 'none';
+    }
+  }
+  
+
+
+
+
+/** Tooltip generator **/
+function makeTooltip(obj){
+  if(!obj) return null;
+  if(obj.properties && obj.properties.nbpoints!==undefined)
+    return { html:`<b>Bâtiment</b><br>Points: ${obj.properties.nbpoints}`, style:{backgroundColor:'#333',color:'#fff',padding:'6px',fontSize:'0.9em'} };
+  if(obj.count!==undefined)
+    return { html:`<b>Agrégation</b><br>Points: ${obj.count}`, style:{backgroundColor:'#2a2a2a',color:'#eee',padding:'6px',fontSize:'0.9em'} };
+  return null;
+}
+
+/** Controls listeners (couches & transport) **/
+function attachControlListeners(prefix, state, onChange){
+  ['scatter','grid','heat','hex','screen','poly'].forEach(type=>{
+    const el=document.getElementById(`radio-${type}-${prefix}`);
+    if(el) el.addEventListener('change',e=>{ if(e.target.checked){ state.layerType=type; onChange(); toggleLegend(type); }});
+  });
+  ['pied','vehicule'].forEach(k=>{
+    const cb=document.getElementById(`filter-${k}-${prefix}`);
+    if(cb) cb.addEventListener('change',e=>{ state.filters[k]=e.target.checked; onChange(); });
+  });
+  const sl=document.getElementById(`point-slider-${prefix}`);
+  const lb=document.getElementById(`slider-value-${prefix}`);
+  if(sl) sl.addEventListener('input',e=>{ state.sliderValue=+e.target.value; if(lb)lb.textContent=e.target.value; onChange(); });
+}
+
+/** Split view **/
+function enterSplit(){
+  if(isSplit) return; isSplit=true;
+  document.getElementById('single-view').style.display='none';
+  document.getElementById('split-view').style.display='flex';
+  document.getElementById('btn-compare').style.display='none';
+  document.getElementById('btn-single').style.display='inline-block';
+  document.getElementById('btn-sync').style.display='inline-block';
+
+  ['left','right'].forEach(side=>{
+    instances[side]=createInstance({
+      container:`canvas-${side}`,
+      controlsPrefix:side,
+      donutId:`donut-${side}`,
+      initialState: instances.single.state,
+      geo: globalGeo
+    });
+    toggleLegend(instances[side].state.layerType);
+      });
+}
+
+/** Exit split **/
+function exitSplit(){
+  if(!isSplit) return; isSplit=false;
+  ['left','right'].forEach(side=>{
+    const inst=instances[side];
+    if(inst){ inst.deckgl.finalize(); inst.chart.destroy(); delete instances[side]; }
+  });
+  document.getElementById('split-view').style.display='none';
+  document.getElementById('single-view').style.display='block';
+  document.getElementById('btn-compare').style.display='inline-block';
+  document.getElementById('btn-single').style.display='none';
+  document.getElementById('btn-sync').style.display='none';
+
+ 
+
+}
+
+// À placer à la fin de script.js ou dans un fichier séparé exportPdf.js
+document.getElementById('btn-export-pdf').addEventListener('click', async () => {
+  const { jsPDF } = window.jspdf;
+
+  // Étape 1 : capturer les deux canvas WebGL (fond de carte + données DeckGL)
+  const mapCanvas = document.querySelector('.mapboxgl-canvas');
+  const deckCanvas = instances.single.deckgl.canvas;
+
+  // Fusionne les deux dans un seul canvas
+  const mergedCanvas = document.createElement('canvas');
+  mergedCanvas.width = deckCanvas.width;
+  mergedCanvas.height = deckCanvas.height;
+  const mergedCtx = mergedCanvas.getContext('2d');
+
+  // 1. Fond de carte
+  mergedCtx.drawImage(mapCanvas, 0, 0);
+
+  // 2. Données Deck.gl
+  mergedCtx.drawImage(deckCanvas, 0, 0);
+
+  // Image combinée
+  const deckImage = new Image();
+  deckImage.src = mergedCanvas.toDataURL('image/png');
+  await new Promise(resolve => deckImage.onload = resolve);
+
+  // Étape 2 : capturer les autres éléments (header, légende, graphiques)
+  const headerCanvas = await html2canvas(document.getElementById('header'));
+  const legendCanvas = await html2canvas(document.getElementById('legend-block'));
+  const chartsCanvas = await html2canvas(document.getElementById('chart-panel-single'));
+
+  // Étape 3 : créer un canvas final combiné
+  const width = Math.max(
+    mergedCanvas.width,
+    headerCanvas.width,
+    legendCanvas.width,
+    chartsCanvas.width
+  );
+  const totalHeight = headerCanvas.height + mergedCanvas.height + legendCanvas.height + chartsCanvas.height;
+
+  const finalCanvas = document.createElement('canvas');
+  finalCanvas.width = width;
+  finalCanvas.height = totalHeight;
+  const ctx = finalCanvas.getContext('2d');
+
+  // Dessiner chaque section
+  let y = 0;
+  ctx.drawImage(headerCanvas, 0, y);
+  y += headerCanvas.height;
+  ctx.drawImage(deckImage, 0, y);
+  y += deckImage.height;
+  ctx.drawImage(legendCanvas, 0, y);
+  y += legendCanvas.height;
+  ctx.drawImage(chartsCanvas, 0, y);
+
+  // Étape 4 : générer le PDF
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [width, totalHeight] });
+  const finalImg = finalCanvas.toDataURL('image/png');
+  pdf.addImage(finalImg, 'PNG', 0, 0, width, totalHeight);
+  pdf.save('map.pdf');
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Fonction pour recréer la couche sélectionnée
-    function updateLayer() {
-      const heatSelected = document.getElementById("radio-heat").checked;
-      const scatterSelected = document.getElementById("radio-scatter").checked;
-      const gridSelected = document.getElementById("radio-grid").checked;
-      const hex3DSelected = document.getElementById("radio-hex").checked;
-      const ScreenSelected = document.getElementById("radio-screen").checked;
-
-      let newLayer;
-      let updatedViewState = { ...currentViewState };
-
-      // 🔁 Mise à jour de la vue selon la couche
-      if (ScreenSelected) {
-        updatedViewState.pitch = 0;
-        updatedViewState.bearing = 0;
-      } else {
-        updatedViewState.pitch = 50;
-        updatedViewState.bearing = 0;
-      }
-
-      if (scatterSelected) {
-        newLayer = new ScatterplotLayer({
-          id: "ScatterplotLayer",
-          data: points,
-          radiusMinPixels: 1.4,
-          radiusMaxPixels: 50,
-          getRadius: 1,
-          radiusUnits: "pixels",
-          getFillColor: d =>
-            d.prixm2 > 4000 ? [202, 0, 32] :
-            d.prixm2 > 3000 ? [244, 165, 130] :
-            d.prixm2 > 2000 ? [146, 197, 222] :
-                              [5, 113, 176],
-          getPosition: d => [d.lon, d.lat],
-          opacity: 0.7
-        });
-      } else if (gridSelected) {
-        newLayer = new GridLayer({
-          id: "GridLayer",
-          data: points,
-          cellSize: 100,
-          coverage: 0.8,
-          elevationScale: 1,
-          extruded: true,
-          getPosition: d => [d.lon, d.lat],
-          getElevationValue: points => points.length,
-        
-          colorAggregation: "SUM",
-          colorScaleType: "quantile",
-          opacity: 1,
-          pickable: false,
-          colorRange: [
-            [1, 152, 189],
-            [73, 227, 206],
-            [216, 254, 181],
-            [254, 237, 177],
-            [254, 173, 84],
-            [209, 55, 78]
-          ]
-        });
-      } else if (heatSelected) {
-        newLayer = new HeatmapLayer({
-          id: "HeatmapLayer",
-          data: points,
-          radiusPixels: 50,
-          threshold: 0.5,
-          getPosition: d => [d.lon, d.lat]
-        });
-      } else if (hex3DSelected) {
-        newLayer = new HexagonLayer({
-          id: "HexagonLayer",
-          data: points,
-          getPosition: d => [d.lon, d.lat],
-          radius: 50,
-          coverage: 0.8,
-          elevationScale: 1,
-          extruded: true,
-          getElevationValue: points => points.length,
-          colorAggregation: "SUM",
-          colorScaleType: "quantile",
-          opacity: 0.8,
-          pickable: false,
-          colorRange: [
-            [1, 152, 189],
-            [73, 227, 206],
-            [216, 254, 181],
-            [254, 237, 177],
-            [254, 173, 84],
-            [209, 55, 78]
-          ]
-        });
-      } else if (ScreenSelected) {
-          newLayer = new ScreenGridLayer({
-            id: 'ScreenGridLayer',
-            data: points,
-            opacity: 0.5,
-            cellSizePixels: 20,
-            colorRange: [
-              [1, 152, 189],
-              [73, 227, 206],
-              [216, 254, 181],
-              [254, 237, 177],
-              [254, 173, 84],
-              [209, 55, 78]
-            ],
-            getPosition: d => [d.lon, d.lat],
-          });
-        }
-
-
-
-
-
-
-        // Exemple de couche GeoJsonLayer pour dessiner les quartiers de Rennes
-        const quartiersLayer = new deck.GeoJsonLayer({
-          id: 'quartiers-layer',
-          data: 'https://data.rennesmetropole.fr/api/explore/v2.1/catalog/datasets/perimetres-des-12-quartiers-de-la-ville-de-rennes/exports/geojson?lang=fr&timezone=Europe%2FBerlin',
-          
-          /* Options de style */
-          stroked: true,                  // on dessine la bordure
-          filled: true,                   // on autorise un remplissage
-          getLineColor: [37, 211, 102],   // #25d366 => en [R, G, B]
-          lineWidthMinPixels: 2,
-          
-          /* Couleurs de remplissage par défaut = transparent */
-          getFillColor: [0, 0, 0, 0],     // invisible quand pas survolé
-          
-          /* Interactions */
-          pickable: false,         // rend la couche "cliquable/hoverable"
-          autoHighlight: false,    // active un effet de survol automatique
-          highlightColor: [255, 255, 255, 40], // couleur survol: blanc semi-transparent
-          
-          /* Clic sur le quartier => mise à jour du #quartier-nom */
-          onClick: info => {
-            if (info.object) {
-              const nomQuartier = info.object.properties.nom;
-              document.querySelector('#quartier-nom').textContent = `| Quartier ${nomQuartier}`;
-            }
-          }
-        });
-        
-
-
-
-
-
-      // Mise à jour de la carte avec la nouvelle couche
-      deckgl.setProps({ 
-        layers: [newLayer,
-          quartiersLayer
-        ],
-        viewState: updatedViewState //Passer du pitch 50 au 0 en fct de la couche
-      });
-      
-    }
-
-    // Ajouter les écouteurs sur les boutons radio
-    document.getElementById("radio-heat").addEventListener("change", updateLayer);
-    document.getElementById("radio-scatter").addEventListener("change", updateLayer);
-    document.getElementById("radio-grid").addEventListener("change", updateLayer);
-    document.getElementById("radio-hex").addEventListener("change", updateLayer);
-    document.getElementById("radio-screen").addEventListener("change", updateLayer);
-
-    // Afficher GridLayer par défaut au chargement
-    updateLayer();
-  })
-  .catch(error => console.error("❌ Erreur lors du chargement du JSON:", error));
-
-
-
+// Gestion des boutons latéraux
+document.querySelectorAll('.sidebar-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const targetId = button.dataset.target;
+    document.querySelectorAll('.sidebar-panel').forEach(panel => {
+      panel.style.display = panel.id === targetId && panel.style.display !== 'block' ? 'block' : 'none';
+    });
+  });
+});

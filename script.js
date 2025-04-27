@@ -459,7 +459,7 @@ hourSliderEl.noUiSlider.on('update', (v, handle) => {
     
     const hourlyCount = new Array(24).fill(0);
     pts.forEach(p => {
-      const h = +p.hour;
+      const h = +p.hh;
       if (h >= 0 && h < 24) hourlyCount[h]++;
     });
     histoChart.data.datasets[0].data = hourlyCount;

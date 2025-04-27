@@ -26,6 +26,17 @@ let heatmapThreshold = 0.03;
 let heatmapRadius = 30;
 let selectedQuartierPolygon = null;
 
+
+
+const CATEGORY_MAP = {
+  1:  { key:'aerien',   label:'Aérien',          color:[161, 66, 244] },
+  30: { key:'eau',      label:'Eau',             color:[  0,188,212] },
+  60: { key:'inconnu',  label:'Inconnu',         color:[158,158,158] },
+  61: { key:'pieton',   label:'Piéton',          color:[ 45,175, 69] },
+  62: { key:'mobilite', label:'Mobilité douce',  color:[244,180,  0] },
+  63: { key:'voiture',  label:'Voiture',         color:[  7, 55,117] }
+};
+
 // Default initial state for single view
 const defaultState = {
   viewState: {
@@ -36,8 +47,12 @@ const defaultState = {
     bearing: 0
   },
   filters: {
-    pied: true,
-    vehicule: true,
+    aerien:   true,
+    eau:      true,
+    inconnu:  true,
+    pieton:   true,
+    mobilite: true,
+    voiture:  true,
     months: [],       // mois sélectionnés (1–12)
     daysOfWeek: [],   // jours sélectionnés (1=Lu…7=Di)
     hours: [0, 23]    // plage d’heures
@@ -47,7 +62,7 @@ const defaultState = {
 };
 
 // Load geojson and initialize
-fetch("ZN_bat_60-61_w_IDs.geojson")
+fetch("2milion.geojson")
   .then(res => res.json())
   .then(geojson => {
 
@@ -63,12 +78,15 @@ fetch("ZN_bat_60-61_w_IDs.geojson")
         points.push({ lon, lat, ...f.properties });
       }
     });
-    points.forEach(d => d.transp_kind = Number(d.transp_kind));
-    const piedPts     = points.filter(d => d.transp_kind === 60);
-    const vehiculePts = points.filter(d => d.transp_kind === 61);
 
-    // Store global data
-    globalGeo = { piedPts, vehiculePts };
+    console.log('points chargés =', points.length);
+    console.log('exemple de propriétés =', points[0]);
+    points.forEach(d => d.transp_kind = Number(d.transp_kind));
+    globalGeo = {};
+    Object.entries(CATEGORY_MAP).forEach(([kind, { key }]) => {
+           globalGeo[key + 'Pts'] = points.filter(p => p.transp_kind === +kind);
+     });
+
 
     // Create single view instance
     instances.single = createInstance({
@@ -102,8 +120,12 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
   const state = {
     viewState: { ...initialState.viewState },
     filters: {
-      pied:        initialState.filters.pied,
-      vehicule:    initialState.filters.vehicule,
+      aerien:   initialState.filters.aerien,
+      eau:      initialState.filters.eau,
+      inconnu:  initialState.filters.inconnu,
+      pieton:   initialState.filters.pieton,
+      mobilite: initialState.filters.mobilite,
+      voiture:  initialState.filters.voiture,
       months:      [...initialState.filters.months],
       daysOfWeek:  [...initialState.filters.daysOfWeek],
       hours:       [...initialState.filters.hours]
@@ -156,13 +178,22 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
 });
 
   /*––– Donut –––*/
+  const labels   = Object.values(CATEGORY_MAP).map(c => c.label);
+  const bgColors = Object.values(CATEGORY_MAP).map(({ color }) => `rgb(${color.join(',')})`);
+                       
+  
   const ctx = document.getElementById(donutId).getContext('2d');
   const chart = new Chart(ctx,{
     type:'doughnut',
-    data:{ labels:['À pied','Véhicule'], datasets:[{ data:[0,0], backgroundColor:['#2daf45','#073775'] }]},
-    options:{ cutout:'60%', plugins:{ legend:{display:false}, datalabels:{ color:'#fff', formatter:(v,ctx)=>{ const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); return t?Math.round(v/t*100)+'%':''; }}}},
+    data:{ labels, datasets:[{ data:new Array(6).fill(0), backgroundColor:bgColors }]},
+    options:{ cutout:'60%', plugins:{ legend:{display:false},
+      datalabels:{ color:'#fff',
+        formatter:(v,ctx)=>{
+          const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+          return t?Math.round(v/t*100)+'%':''; }}}},
     plugins:[ChartDataLabels]
   });
+  
 
   /*––– DeckGL –––*/
   const deckgl = new DeckGL({
@@ -343,17 +374,19 @@ hourSliderEl.noUiSlider.on('update', (v, handle) => {
   function onFiltersChange(){ updateView(); }
 
   function updateView(){
-    let pts=[];
-    if(state.filters.pied)     pts.push(...geo.piedPts);
-    if(state.filters.vehicule) pts.push(...geo.vehiculePts);
+    let pts = [];
+    Object.values(CATEGORY_MAP).forEach(({ key }) => {
+    if (state.filters[key]) pts = pts.concat(geo[key + 'Pts']);
+  });
+
   
     if(state.filters.months.length === 0 || state.filters.daysOfWeek.length === 0){
       pts = [];
     } else {
       pts = pts.filter(d => {
-        const m = +d.month;
+        const m = +d.MM;
         const w = ('' + d.day_of_week).trim();
-        const h = +d.hour;
+        const h = +d.hh;
         return (
           state.filters.months.includes(m) &&
           state.filters.daysOfWeek.includes(w) &&
@@ -418,11 +451,11 @@ hourSliderEl.noUiSlider.on('update', (v, handle) => {
       quartiersLayer
     ]});
   
-    chart.data.datasets[0].data = [
-      pts.filter(p=>p.transp_kind===60).length,
-      pts.filter(p=>p.transp_kind===61).length
-    ];
+    chart.data.datasets[0].data = Object.keys(CATEGORY_MAP).map(k =>
+      pts.filter(p => p.transp_kind === +k).length
+    );
     chart.update();
+    
     
     const hourlyCount = new Array(24).fill(0);
     pts.forEach(p => {
@@ -450,7 +483,7 @@ function buildLayer(type, data, slider) {
       radiusMaxPixels: 50,
       getRadius: 1,
       radiusUnits: 'pixels',
-      getFillColor: d => d.transp_kind === 60 ? [255, 0, 0] : [0, 0, 255],
+      getFillColor: d => CATEGORY_MAP[d.transp_kind]?.color || [0,0,0],
       getPosition: d => [d.lon, d.lat],
       opacity: 0.7 });
     case 'grid':    return new GridLayer({ id:'GridLayer', 
@@ -535,10 +568,14 @@ function attachControlListeners(prefix, state, onChange){
     const el=document.getElementById(`radio-${type}-${prefix}`);
     if(el) el.addEventListener('change',e=>{ if(e.target.checked){ state.layerType=type; onChange(); toggleLegend(type); }});
   });
-  ['pied','vehicule'].forEach(k=>{
-    const cb=document.getElementById(`filter-${k}-${prefix}`);
-    if(cb) cb.addEventListener('change',e=>{ state.filters[k]=e.target.checked; onChange(); });
-  });
+  ['aerien','eau','inconnu','pieton','mobilite','voiture']
+  .forEach(k=>{
+     const cb=document.getElementById(`filter-${k}-${prefix}`);
+     if(cb) cb.addEventListener('change',e=>{
+       state.filters[k]=e.target.checked;
+       onChange();
+     });
+});
   const sl=document.getElementById(`point-slider-${prefix}`);
   const lb=document.getElementById(`slider-value-${prefix}`);
   if(sl) sl.addEventListener('input',e=>{ state.sliderValue=+e.target.value; if(lb)lb.textContent=e.target.value; onChange(); });
@@ -583,24 +620,73 @@ function exitSplit(){
 }
 
 // À placer à la fin de script.js ou dans un fichier séparé exportPdf.js
-document.getElementById('btn-export-pdf').addEventListener('click', () => {
+document.getElementById('btn-export-pdf').addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: 'a4' });
 
-  const canvas = instances.single.deckgl.canvas;
+  // Étape 1 : capturer les deux canvas WebGL (fond de carte + données DeckGL)
+  const mapCanvas = document.querySelector('.mapboxgl-canvas');
+  const deckCanvas = instances.single.deckgl.canvas;
 
-  const imgData = canvas.toDataURL('image/png');
+  // Fusionne les deux dans un seul canvas
+  const mergedCanvas = document.createElement('canvas');
+  mergedCanvas.width = deckCanvas.width;
+  mergedCanvas.height = deckCanvas.height;
+  const mergedCtx = mergedCanvas.getContext('2d');
 
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  // 1. Fond de carte
+  mergedCtx.drawImage(mapCanvas, 0, 0);
 
-  const imgWidth = pageWidth;
-  const imgHeight = pageWidth * canvas.height / canvas.width;
+  // 2. Données Deck.gl
+  mergedCtx.drawImage(deckCanvas, 0, 0);
 
-  const x = 0;
-  const y = (pageHeight - imgHeight) / 2;
+  // Image combinée
+  const deckImage = new Image();
+  deckImage.src = mergedCanvas.toDataURL('image/png');
+  await new Promise(resolve => deckImage.onload = resolve);
 
-  pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+  // Étape 2 : capturer les autres éléments (header, légende, graphiques)
+  const headerCanvas = await html2canvas(document.getElementById('header'));
+  const legendCanvas = await html2canvas(document.getElementById('legend-block'));
+  const chartsCanvas = await html2canvas(document.getElementById('chart-panel-single'));
+
+  // Étape 3 : créer un canvas final combiné
+  const width = Math.max(
+    mergedCanvas.width,
+    headerCanvas.width,
+    legendCanvas.width,
+    chartsCanvas.width
+  );
+  const totalHeight = headerCanvas.height + mergedCanvas.height + legendCanvas.height + chartsCanvas.height;
+
+  const finalCanvas = document.createElement('canvas');
+  finalCanvas.width = width;
+  finalCanvas.height = totalHeight;
+  const ctx = finalCanvas.getContext('2d');
+
+  // Dessiner chaque section
+  let y = 0;
+  ctx.drawImage(headerCanvas, 0, y);
+  y += headerCanvas.height;
+  ctx.drawImage(deckImage, 0, y);
+  y += deckImage.height;
+  ctx.drawImage(legendCanvas, 0, y);
+  y += legendCanvas.height;
+  ctx.drawImage(chartsCanvas, 0, y);
+
+  // Étape 4 : générer le PDF
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [width, totalHeight] });
+  const finalImg = finalCanvas.toDataURL('image/png');
+  pdf.addImage(finalImg, 'PNG', 0, 0, width, totalHeight);
   pdf.save('map.pdf');
 });
 
+
+// Gestion des boutons latéraux
+document.querySelectorAll('.sidebar-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const targetId = button.dataset.target;
+    document.querySelectorAll('.sidebar-panel').forEach(panel => {
+      panel.style.display = panel.id === targetId && panel.style.display !== 'block' ? 'block' : 'none';
+    });
+  });
+});

@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+
+
 body, html {
   margin: 0;
   padding: 0;
@@ -7,6 +9,10 @@ body, html {
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
+
+
+
+
 
 #container {
   position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
@@ -23,25 +29,26 @@ body, html {
   left: 0;
 }
 
+
+
+
 /* HEADER */
 #header {
   position: fixed;
-  top: 15px;
-  left: 40px;
-  right: 40px;
-  border-radius: 8px;
+  top: 0px;
+  left: 0px;
+  width: 100%;
   gap: 15px;
-  height: 8%;     /* ou la hauteur que tu souhaites */
+  height: 6%;     /* ou la hauteur que tu souhaites */
   z-index: 1001;    /* pour passer au-dessus de la carte */
-  background: #323B42;
+  color: #1C4568 ;
+  background: #fff;
   opacity: 0.9;
-  color: rgb(255, 255, 255);
   display: flex;
   align-items: center;
   padding: 10px;
   font-family: Poppins;
-
-  font-size: 20px;
+  font-size: 16px;
   justify-content: space-between;/* espace entre le bloc de gauche et celui de droite */
 }
 
@@ -52,19 +59,13 @@ body, html {
 }
 
 
-
 #header-logo {
   display: flex;
   align-items:center;
   gap: 0px;
   white-space: nowrap;
-  color: rgb(255, 255, 255);
-  font-size: 6px;
   margin-left: 0px;
   text-decoration: none;
-  font-weight: bold;
-  font-family: Poppins;
-  font-size: 36px;
 }
 
 #header img {
@@ -77,6 +78,7 @@ body, html {
   display: flex;
   align-items: center;
   gap: 10px; /* Espace entre le toggle et le bouton */
+  margin-right: 40px;
 }
 
 #header-right svg {
@@ -86,17 +88,40 @@ body, html {
   fill: white;
 }
 
+
+
 #header button {
-  background-color: #124E66; /* Choisir une couleur pour le bouton */
-  color: white;
-  padding: 5px 10px;
-  font-family: Poppins; 
-  font-size: 18px;
-  font-weight: bold;
-  border: none;
-  border: white;
-  border-radius: 5px;
+  color: #1C4568;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(158, 162, 174);
+  border-right-color: rgb(158, 162, 174);
+  border-bottom-color: rgb(158, 162, 174);
+  border-left-color: rgb(158, 162, 174);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  padding-top: 6px;
+  padding-right: 18px;
+  padding-left: 18px;
+  line-height: 18px;
+  background-color: transparent;
+  margin-left: 42px;
   cursor: pointer;
+  overflow: visible;
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+  text-align: center;
+  align-items: center;
 }
 
 #header button:hover {
@@ -106,6 +131,45 @@ body, html {
 
 /*  Gestion fond de carte */
 .map-select {
+  color: #1C4568;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(158, 162, 174);
+  border-right-color: rgb(158, 162, 174);
+  border-bottom-color: rgb(158, 162, 174);
+  border-left-color: rgb(158, 162, 174);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  padding-top: 6px;
+  padding-right: 18px;
+  padding-left: 18px;
+  line-height: 18px;
+  background-color: #fff;
+  margin-left: 42px;
+  cursor: pointer;
+  overflow: visible;
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0px;
+  text-align: center;
+  align-items: center;
+}
+
+.map-select:hover {
+  background-color: #199b43;
+}
+
+
+#btn-export {
   background-color: #124E66;
   color: white;
   padding: 6px 12px;
@@ -117,12 +181,6 @@ body, html {
   cursor: pointer;
   margin-right: 20px;
 }
-
-.map-select:hover {
-  background-color: #199b43;
-}
-
-
 
 
 /* SINGLE VIEW & SPLIT VIEW CONTAINERS */
@@ -165,12 +223,9 @@ body, html {
 /* Controls Panels Positioning */
 #layer-controls-single,
 #controls-left {
-  position: absolute;
-  top: 15%;
-  border-radius: 8px;
-  max-width: 460px;
-  left: 40px;
-  z-index: 1000;
+  left: auto;
+  right: 24px;
+  top: 24px;
 }
 
 #controls-right {
@@ -191,20 +246,7 @@ body, html {
 }
 
 /* OVERRIDE: .layer-controls & .slider-container styling */
-.layer-controls {
-  position: absolute;
-  top: 20px;        /* ou 50px si vous voulez partir sous le header */
-  left: 20px;
-  bottom: 20px;     /* étire jusqu’à 20px du bas de l’écran */
-  width: 300px;    /* ou la largeur que vous souhaitez */
-  background: rgba(38, 41, 44, 0.95);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  border-radius: 8px;
-  padding: 10px;
-  overflow-y: auto; /* scroll si trop long */
-  z-index: 1000;
-  color: #ffffffff
-}
+
 
 .layer-controls label {
   display: flex;
@@ -217,101 +259,10 @@ body, html {
   position: relative;
 }
 
-.layer-controls label::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 220px;
-  height: 45px;
-  z-index: -1;
-  border-radius: 10px;
-  border: 2px solid transparent;
-  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
 
-.layer-controls label:hover::before {
-  background-color: #2a2e3c;
-}
 
-.layer-controls label:has(input:checked)::before {
-  background-color: #2d3750;
-  border-color: #435dd8;
-}
 
-.layer-controls input[type="radio"] {
-  background-color: #afafb3;
-  appearance: none;
-  width: 17px;
-  height: 17px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
 
-.layer-controls input[type="radio"]:checked {
-  background-color: #858585;
-  animation: pulse 0.7s forwards;
-}
-
-.layer-controls input[type="radio"]::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #fff;
-  transform: scale(0);
-  transition: transform 0.1s ease;
-  position: absolute;
-}
-
-.layer-controls input[type="radio"]:checked::before {
-  transform: scale(1);
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
-  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-}
-
-.slider-container {
-  background: rgba(33, 44, 53, 0.8);
-  border-radius: 8px;
-  padding: 8px 20px;
-  margin-top: 10px;
-  width: 220px;
-  color: white;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-}
-
-.slider-container h3 {
-  margin: 8px 0 4px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.slider-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.slider-container input[type="range"] {
-  flex: 1;
-  max-width: 160px;
-}
-
-.slider-container span {
-  min-width: 30px;
-  text-align: right;
-  font-weight: 600;
-}
 
 /* -------------------------------------------------------
    Styles pour les filtres temporels (mois, jours, heures)
@@ -379,7 +330,6 @@ body, html {
   left: 400px;
   z-index: 1000;
   width: 520px; /* ou plus selon ton espace disponible */
-
   height: 220px;
 }
 
@@ -457,4 +407,158 @@ body.dark-mode .legend-container {
 
 #btn-export-pdf:hover {
   background-color: #199b43;
+}
+
+
+
+
+
+
+#sidebar-buttons {
+  position: fixed;
+  top: 100px;
+  left: 15px;
+  background: rgb(251, 252, 254);
+  display: flex;
+  flex-direction: column;
+  z-index: 1200;
+  border-radius: 12px;
+  padding: 2px;
+  
+}
+
+.sidebar-btn {
+  fill :rgb(158, 162, 174);
+  width: 56px;
+  height: 60px;
+  border-radius: 12px;
+  background-size: 60%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  cursor: pointer;
+  outline: 0px;
+  transition: background-color 0.2s;
+  border: medium;
+}
+
+.sidebar-btn:hover {
+  background-color: #199b43;
+}
+
+.sidebar-btn:nth-child(1) {
+  background-image: url('https://www.svgrepo.com/show/532917/layer-group.svg');
+  
+}
+.sidebar-btn:nth-child(2) {
+  background-image: url('https://www.svgrepo.com/show/532173/filter-xmark.svg'); /* Icône transports */
+}
+.sidebar-btn:nth-child(3) {
+  background-image: url('https://www.svgrepo.com/show/521888/time.svg'); /* Icône clock/temps */
+}
+
+.sidebar-panel {
+  position: relative;
+  flex-direction: column;
+  top: 100px;
+  left: 90px;
+  width: 359px;
+  max-height: calc(-115px + 100vh);
+  padding-bottom: 26px;
+  overflow-y: auto;
+  background-color: rgb(251, 252, 254);
+  border-radius: 8px;
+  padding: 20px;
+  z-index: 1200;
+  display: flex;
+  color: white;
+}
+
+.ChoixLayer {
+  font-family: inherit;
+  color: #124E66;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  margin-bottom: 10px;
+}
+
+.layer-group {
+  font-family: inherit;
+  font-size: 14px;
+  color: #124E66;
+}
+
+.TypeAgreg {
+  font-family: inherit;
+  color: #124E66;
+  font-size: 14px;
+}
+
+.NomFiltre{
+  font-family: inherit;
+  font-size: 12px;
+  color: #124E66;
+  margin-bottom: 5px;
+}
+
+/* level settings 👇 */
+
+.slider-wrapper {
+  /* slider */
+  --slider-width: 100%;
+  --slider-height: 6px;
+  --slider-bg: #1C4568;
+  --slider-border-radius: 999px;
+  /* level */
+  --level-color: grey;
+  --level-transition-duration: .1s;
+  /* icon */
+  --icon-margin: 15px;
+  --icon-color: var(--slider-bg);
+  --icon-size: 25px;
+}
+
+.slider-wrapper {
+  cursor: pointer;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+
+
+.slider-wrapper .level {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: var(--slider-width);
+  height: var(--slider-height);
+  background: var(--slider-bg);
+  overflow: hidden;
+  border-radius: var(--slider-border-radius);
+  -webkit-transition: height var(--level-transition-duration);
+  -o-transition: height var(--level-transition-duration);
+  transition: height var(--level-transition-duration);
+  cursor: inherit;
+}
+
+.slider-wrapper .level::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  -webkit-box-shadow: -200px 0 0 200px var(--level-color);
+  box-shadow: -200px 0 0 200px var(--level-color);
+}
+
+.slider-wrapper:hover .level {
+  height: calc(var(--slider-height) * 2);
 }

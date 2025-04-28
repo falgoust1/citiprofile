@@ -138,14 +138,31 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
     sliderValue:  initialState.sliderValue,
     cellSize:    initialState.cellSize
   };
+  const radioInit = document.getElementById(
+    `radio-${state.layerType}-${controlsPrefix}`
+  );
+  if (radioInit) {
+    radioInit.checked = true;                     // coche le bon bouton
+    // force le style “sélectionné” (si CSS dépend de :checked)
+    radioInit.dispatchEvent(new Event('change')); // déclenche l’update éventuel
+  }
 
 
-  // 1. Créer l'élément canvas pour l'histogramme
-  const histoCtx = document.getElementById(`${controlsPrefix}-hour-histogram`).getContext('2d');
-  const histoChart = new Chart(histoCtx, {
+  /* ---------- Histogramme ---------- */
+
+// récupère le canvas
+const histoCanvas = document.getElementById(`${controlsPrefix}-hour-histogram`);
+
+// s’il y a déjà un graphique dessus, on le détruit
+const prevHisto = Chart.getChart(histoCanvas);
+if (prevHisto) prevHisto.destroy();
+
+// (re)création propre
+const histoCtx   = histoCanvas.getContext('2d');
+const histoChart = new Chart(histoCtx, {
   type: 'bar',
   data: {
-    labels: Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0')), // '00' à '23'
+    labels: Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')), // '00'–'23'
     datasets: [{
       label: 'Points par heure',
       data: new Array(24).fill(0),
@@ -155,49 +172,43 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
   options: {
     responsive: true,
     scales: {
-      x: {
-        // ... tes options de titre et ticks
-        grid: {
-          color: '#ffffff',  
-          opacity: 0,      // facultatif : couleur des lignes de fond
-          lineWidth: 2, 
-          display: false,         // ← ÉPAISSEUR des lignes
-        }
-      },
-      y: {
-        beginAtZero: true,
-        // ... titre et ticks
-        grid: {
-          color: '#ffffff',  
-          opacity: 0,
-          lineWidth: 2,
-          display: false,
-        }
-      }
-    }
-    ,
-    plugins: {
-      legend: { display: false }
-    }
+      x: { grid: { color:'#ffffff', opacity:0, lineWidth:2, display:false } },
+      y: { beginAtZero:true, grid:{ color:'#ffffff', opacity:0, lineWidth:2, display:false } }
+    },
+    plugins: { legend: { display:false } }
   }
 });
 
-  /*––– Donut –––*/
-  const labels   = Object.values(CATEGORY_MAP).map(c => c.label);
-  const bgColors = Object.values(CATEGORY_MAP).map(({ color }) => `rgb(${color.join(',')})`);
-                       
-  
-  const ctx = document.getElementById(donutId).getContext('2d');
-  const chart = new Chart(ctx,{
-    type:'doughnut',
-    data:{ labels, datasets:[{ data:new Array(6).fill(0), backgroundColor:bgColors }]},
-    options:{ cutout:'60%', plugins:{ legend:{display:false},
-      datalabels:{ color:'#fff',
-        formatter:(v,ctx)=>{
-          const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
-          return t?Math.round(v/t*100)+'%':''; }}}},
-    plugins:[ChartDataLabels]
-  });
+/* ---------- Donut ---------- */
+
+// idem : on sécurise avant de (re)créer
+const donutCanvas = document.getElementById(donutId);
+const prevDonut   = Chart.getChart(donutCanvas);
+if (prevDonut) prevDonut.destroy();
+
+const labels   = Object.values(CATEGORY_MAP).map(c => c.label);
+const bgColors = Object.values(CATEGORY_MAP).map(({ color }) => `rgb(${color.join(',')})`);
+
+const ctx   = donutCanvas.getContext('2d');
+const chart = new Chart(ctx, {
+  type: 'doughnut',
+  data: { labels, datasets: [{ data: new Array(6).fill(0), backgroundColor: bgColors }] },
+  options: {
+    cutout: '60%',
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        color: '#fff',
+        formatter: (v, ctx) => {
+          const t = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+          return t ? Math.round(v / t * 100) + '%' : '';
+        }
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+
   
 
   /*––– DeckGL –––*/
@@ -235,10 +246,14 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
 
       attachControlListeners(controlsPrefix, state, updateView);
 
-      const thresholdSlider = document.getElementById('threshold-slider');
-      const radiusSlider = document.getElementById('radius-slider');
-      const thresholdValueEl = document.getElementById('threshold-value');
-      const radiusValueEl = document.getElementById('radius-value');
+      const tId   = `threshold-slider-${controlsPrefix}`;
+      const rId   = `radius-slider-${controlsPrefix}`;
+      const tvId  = `threshold-value-${controlsPrefix}`;
+      const rvId  = `radius-value-${controlsPrefix}`;
+      const thresholdSlider  = document.getElementById(tId);
+      const radiusSlider     = document.getElementById(rId);
+      const thresholdValueEl = document.getElementById(tvId);
+      const radiusValueEl    = document.getElementById(rvId);
       const cellSlider  = document.getElementById(`cell-slider-${controlsPrefix}`);
       const cellValueEl = document.getElementById(`cell-value-${controlsPrefix}`);
 
@@ -345,26 +360,36 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
   );
 
   /*––– Slider heures –––*/
-  // valeurs cochées par défaut  ➜  on remplit d'emblée les filtres
+// valeurs cochées par défaut
 state.filters.months     = getCheckedMonths(`month-checkboxes-${controlsPrefix}`);
 state.filters.daysOfWeek = getCheckedDays  (`dow-checkboxes-${controlsPrefix}`);
 
 // rendu initial de la carte
 updateView();
 
-  const hourSliderEl = document.getElementById(`hour-slider-${controlsPrefix}`);
-  noUiSlider.create(hourSliderEl,{
-    start:state.filters.hours, connect:true, step:1, range:{min:0,max:23},
-    format:{ to:v=>Math.round(v), from:v=>+v }
-  });
-  // Crée des spans pour afficher les heures formatées
+/* ----- création “safe” du slider ----- */
+const hourSliderEl = document.getElementById(`hour-slider-${controlsPrefix}`);
+
+// si le slider existe déjà (retour d’un précédent compare) → on le détruit
+if (hourSliderEl.noUiSlider) hourSliderEl.noUiSlider.destroy();
+
+/* puis on le recrée proprement */
+noUiSlider.create(hourSliderEl, {
+  start: state.filters.hours,
+  connect: true,
+  step: 1,
+  range: { min: 0, max: 23 },
+  format: { to: v => Math.round(v), from: v => +v }
+});
+
+/* labels “00h – 23h” */
 const hourLabels = [document.createElement('div'), document.createElement('div')];
 hourLabels.forEach(label => {
-  label.style.marginTop = '4px';
-  label.style.textAlign = 'center';
-  label.style.fontSize = '13px';
-  label.style.color = 'black';
-  label.style.fontFamily = 'Poppins';
+  label.style.marginTop   = '4px';
+  label.style.textAlign   = 'center';
+  label.style.fontSize    = '13px';
+  label.style.color       = 'black';
+  label.style.fontFamily  = 'Poppins';
   hourSliderEl.appendChild(label);
 });
 
@@ -374,14 +399,20 @@ hourSliderEl.noUiSlider.on('update', (v, handle) => {
     label.textContent = `${Math.round(v[i])}h`;
     const percent = (v[i] / 23) * 100;
     label.style.position = 'absolute';
-    label.style.left = `calc(${percent}% - 10px)`; // centrer horizontalement
+    label.style.left = `calc(${percent}% - 10px)`; // centrage horizontal
   });
   onFiltersChange();
 });
 
 
+
 /*––– Slider jours du mois –––*/
 const domSliderEl = document.getElementById(`dom-slider-${controlsPrefix}`);
+
+/* sécurité : si le slider existe déjà, on le détruit */
+if (domSliderEl.noUiSlider) domSliderEl.noUiSlider.destroy();
+
+/* création “propre” */
 noUiSlider.create(domSliderEl, {
   start: state.filters.daysOfMonth,   // [1, 31]
   connect: true,
@@ -390,25 +421,26 @@ noUiSlider.create(domSliderEl, {
   format: { to: v => Math.round(v), from: v => +v }
 });
 
-// labels optionnels
+/* labels optionnels */
 const domLabels = [document.createElement('div'), document.createElement('div')];
 domLabels.forEach(l => {
-  l.style.marginTop = '4px';
-  l.style.textAlign = 'center';
-  l.style.fontSize = '13px';
-  l.style.color = 'black';
-  l.style.position = 'absolute';
+  l.style.marginTop  = '4px';
+  l.style.textAlign  = 'center';
+  l.style.fontSize   = '13px';
+  l.style.color      = 'black';
+  l.style.position   = 'absolute';
   domSliderEl.appendChild(l);
 });
 
 domSliderEl.noUiSlider.on('update', vals => {
   state.filters.daysOfMonth = vals.map(v => +v);
   vals.forEach((v, i) => {
-    domLabels[i].textContent = v;
-    domLabels[i].style.left = `calc(${(v - 1) / 30 * 100}% - 10px)`;
+    domLabels[i].textContent  = v;
+    domLabels[i].style.left   = `calc(${(v - 1) / 30 * 100}% - 10px)`;
   });
   onFiltersChange();
 });
+
 
 /*––– Reset –––*/
 document.getElementById(`reset-temporal-filters-${controlsPrefix}`)
@@ -670,21 +702,39 @@ function enterSplit(){
 }
 
 /** Exit split **/
-function exitSplit(){
-  if(!isSplit) return; isSplit=false;
-  ['left','right'].forEach(side=>{
-    const inst=instances[side];
-    if(inst){ inst.deckgl.finalize(); inst.chart.destroy(); delete instances[side]; }
+function exitSplit() {
+  if (!isSplit) return;
+  isSplit = false;
+
+  ['left', 'right'].forEach(side => {
+    const inst = instances[side];
+    if (inst) {
+      /* 1. libération DeckGL + Chart */
+      inst.deckgl.finalize();      // détruit DeckGL + MapLibre
+      inst.chart.destroy();        // détruit le doughnut
+
+ /* 2. ➜ détruire aussi l’HISTOGRAMME */
+      const histoCanvas = document.getElementById(`${side}-hour-histogram`);
+      const histoChart  = histoCanvas ? Chart.getChart(histoCanvas) : null;
+      if (histoChart) histoChart.destroy();
+
+ /* 3. on vide le conteneur pour enlever les 2 canvas */
+      const container = document.getElementById(`canvas-${side}`);
+      if (container) container.innerHTML = '';
+
+      delete instances[side];
+    }
   });
-  document.getElementById('split-view').style.display='none';
-  document.getElementById('single-view').style.display='block';
-  document.getElementById('btn-compare').style.display='inline-block';
-  document.getElementById('btn-single').style.display='none';
-  document.getElementById('btn-sync').style.display='none';
 
- 
-
+  /* 3. ré-affichage de la vue single */
+  document.getElementById('split-view').style.display = 'none';
+  document.getElementById('single-view').style.display = 'block';
+  document.getElementById('btn-compare').style.display = 'inline-block';
+  document.getElementById('btn-single').style.display  = 'none';
+  document.getElementById('btn-sync').style.display    = 'none';
 }
+
+
 
 // À placer à la fin de script.js ou dans un fichier séparé exportPdf.js
 document.getElementById('btn-export-pdf').addEventListener('click', async () => {
@@ -748,20 +798,51 @@ document.getElementById('btn-export-pdf').addEventListener('click', async () => 
 });
 
 
-// Gestion indépendante des menus latéraux
-document.querySelectorAll('.sidebar-btn').forEach(btn=>{
-  btn.addEventListener('click', () =>{
-    const targetId = btn.dataset.target;                       // ex. layers-panel-left
-    const scope    = btn.closest('.layer-controls');           // on reste dans la vue
-    scope.querySelectorAll('.sidebar-panel').forEach(panel=>{
-      panel.style.display =
-        (panel.id === targetId && panel.style.display!=='block') ? 'block' : 'none';
+/***************   MENUS LATÉRAUX   **************************/
+document.querySelectorAll('.sidebar-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.dataset.target;
+    const scope    = btn.closest('.layer-controls');
+
+    /* 1)  ouverture / fermeture habituelles  */
+    scope.querySelectorAll('.sidebar-panel').forEach(p => {
+      p.style.display = (p.id === targetId && p.style.display !== 'block') ? 'block' : 'none';
     });
-    /* ─────────── ALIGNE LE PANNEAU SUR LE BOUTON ─────────── */
-      const panel = scope.querySelector('#' + targetId);
-      if (panel && panel.style.display === 'block') {
-        /* distance verticale du bouton à l’intérieur de .layer-controls */
-        panel.style.top = btn.offsetTop + 'px';
+
+    /* 2)  si affiché : alignement + auto-hide amélioré  */
+    const panel = scope.querySelector('#' + targetId);
+    if (panel && panel.style.display === 'block') {
+
+      /* ─ aligner verticalement ─ */
+      panel.style.top = btn.offsetTop + 'px';
+
+      /* ─ auto-hide avec délai ─ */
+      const HIDE_DELAY = 250;          // ms
+      let   hideTimer  = null;
+
+      const startHide = () => {        // lance le compte à rebours
+        hideTimer = setTimeout(() => panel.style.display = 'none', HIDE_DELAY);
+      };
+      const cancelHide = () => {       // annule si on revient dessus
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      };
+
+      /* on nettoie d’anciens écouteurs éventuels */
+      ['mouseenter','mouseleave'].forEach(evt => {
+        panel.removeEventListener(evt, cancelHide);
+        panel.removeEventListener(evt, startHide);
+        btn  .removeEventListener(evt, cancelHide);
+        btn  .removeEventListener(evt, startHide);
+      });
+
+      /* nouveaux écouteurs */
+      panel.addEventListener('mouseenter', cancelHide);
+      panel.addEventListener('mouseleave', startHide);
+      btn  .addEventListener('mouseenter', cancelHide);
+      btn  .addEventListener('mouseleave', startHide);
     }
   });
 });
+
+

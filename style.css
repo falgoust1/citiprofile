@@ -223,11 +223,11 @@ body, html {
 
 
 #controls-right {
-  position: absolute;
-  top: 20%;
-  right: 40px;
-  z-index: 1000;
-}
+    position: absolute;
+    top: 100px;      /* même ancrage vertical que les autres vues */
+    right: 40px;     /* marge intérieure de la moitié droite */
+    z-index: 1200;
+  }
 
 /* TOOLTIP */
 .deck-tooltip {
@@ -459,7 +459,7 @@ body.dark-mode .legend-container {
   flex-direction: column;
   top: 0;
   left: 90px;
-  width: 359px;
+  width: 200px;
   max-height: calc(-115px + 100vh);
   padding-bottom: 26px;
   overflow-y: auto;
@@ -592,9 +592,9 @@ body.dark-mode .legend-container {
 }
 
 #sidebar-buttons-right{
-  position:fixed;
-  top:100px;
-  left:860px;
+  position:absolute;
+  top:0px;
+  left:0px;
   background:#fbfcfe;
   display:flex;
   flex-direction:column;

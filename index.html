@@ -106,13 +106,13 @@
               </label>
                 <div class="NomFiltre">Threshold de la heatmap :</div>
                 <div class="slider-wrapper">
-                  <input type="range" id="threshold-slider" min="0" max="1" step="0.01" value="0.03" class="level">
-                  <span id="threshold-value">0.03</span>
+                  <input type="range" id="threshold-slider-single" min="0" max="1" step="0.01" value="0.03" class="level">
+                  <span id="threshold-value-single">0.03</span>
                 </div>
                 <div class="NomFiltre">Rayon de la heatmap :</div>
                 <div class="slider-wrapper">
-                  <input type="range" id="radius-slider" min="10" max="100" value="30" class="level">
-                  <span id="radius-value">30</span>
+                  <input type="range" id="radius-slider-single" min="10" max="100" value="30" class="level">
+                  <span id="radius-value-single">30</span>
                 </div>
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-hex-single"> Hexbin 3D
@@ -262,7 +262,7 @@
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
-              <input type="radio" name="layer-left" id="radio-scatter-left"> Scatterplot
+              <input type="radio" name="layer-left" id="radio-scatter-left" checked> Scatterplot
             </label>
           </details>
 
@@ -270,11 +270,24 @@
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
-              <input type="radio" name="layer-left" id="radio-grid-left" checked> GridExtrude
+              <input type="radio" name="layer-left" id="radio-grid-left" > GridExtrude
             </label>
             <label class="label">
               <input type="radio" name="layer-left" id="radio-heat-left"> Heatmap
             </label>
+
+              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="threshold-slider-left"  min="0" max="1" step="0.01" value="0.03" class="level">
+                <span id="threshold-value-left">0.03</span>
+              </div>
+
+              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="radius-slider-left"     min="10" max="100" value="30" class="level">
+                <span id="radius-value-left">30</span>
+              </div>
+
             <label class="label">
               <input type="radio" name="layer-left" id="radio-hex-left"> Hexbin 3D
             </label>
@@ -418,7 +431,7 @@
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
-              <input type="radio" name="layer-right" id="radio-scatter-right"> Scatterplot
+              <input type="radio" name="layer-right" id="radio-scatter-right"checked> Scatterplot
             </label>
           </details>
 
@@ -426,11 +439,25 @@
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
-              <input type="radio" name="layer-right" id="radio-grid-right" checked> GridExtrude
+              <input type="radio" name="layer-right" id="radio-grid-right" > GridExtrude
             </label>
             <label class="label">
               <input type="radio" name="layer-right" id="radio-heat-right"> Heatmap
             </label>
+
+              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="threshold-slider-right"  min="0" max="1" step="0.01" value="0.03" class="level">
+                <span id="threshold-value-right">0.03</span>
+              </div>
+
+              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="radius-slider-right"     min="10" max="100" value="30" class="level">
+                <span id="radius-value-right">30</span>
+              </div>
+
+
             <label class="label">
               <input type="radio" name="layer-right" id="radio-hex-right"> Hexbin 3D
             </label>

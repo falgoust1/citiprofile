@@ -206,6 +206,7 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
     mapStyle:"https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
     controller:true,
     viewState: state.viewState,
+    getTooltip: ({object}) => makeTooltip(object),
     onViewStateChange: ({viewState})=>{
       state.viewState = viewState;
        // Ajout : si on a un quartier sélectionné ET qu'on dézoome sous le seuil, on réinitialise le filtre spatial

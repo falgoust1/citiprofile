@@ -757,5 +757,11 @@ document.querySelectorAll('.sidebar-btn').forEach(btn=>{
       panel.style.display =
         (panel.id === targetId && panel.style.display!=='block') ? 'block' : 'none';
     });
+    /* ─────────── ALIGNE LE PANNEAU SUR LE BOUTON ─────────── */
+      const panel = scope.querySelector('#' + targetId);
+      if (panel && panel.style.display === 'block') {
+        /* distance verticale du bouton à l’intérieur de .layer-controls */
+        panel.style.top = btn.offsetTop + 'px';
+    }
   });
 });

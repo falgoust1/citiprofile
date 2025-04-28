@@ -455,9 +455,9 @@ body.dark-mode .legend-container {
 }
 
 .sidebar-panel {
-  position: relative;
+  position: absolute;
   flex-direction: column;
-  top: 100px;
+  top: 0;
   left: 90px;
   width: 359px;
   max-height: calc(-115px + 100vh);
@@ -579,8 +579,8 @@ body.dark-mode .legend-container {
 
 /* même rendu pour single, gauche et droite */
 #sidebar-buttons{
-  position:fixed;
-  top:100px;
+  position:absolute;
+  top:0;
   left:15px;
   background:#fbfcfe;
   display:flex;

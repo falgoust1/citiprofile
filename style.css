@@ -467,7 +467,7 @@ body.dark-mode .legend-container {
   border-radius: 8px;
   padding: 20px;
   z-index: 1200;
-  display: flex;
+  display: none;
   color: white;
 }
 

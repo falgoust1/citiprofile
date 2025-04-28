@@ -91,7 +91,7 @@
           <div class="layer-group">
             <div class="TypeAgreg">Couche brut</div>
             <label class="label">
-              <input type="radio" name="layer-single" id="radio-scatter-single"> Scatterplot
+              <input type="radio" name="layer-single" id="radio-scatter-single" checked> Scatterplot
             </label>
           </div>
           <!-- Agrégations dans une grille -->
@@ -99,7 +99,7 @@
             <div class="TypeAgreg">Agrégations dans une grille</div>
             <div class="ligneContainer">
               <label class="label">
-                <input type="radio" name="layer-single" id="radio-grid-single" checked> GridExtrude
+                <input type="radio" name="layer-single" id="radio-grid-single" > GridExtrude
               </label>
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-heat-single"> Heatmap
@@ -120,6 +120,14 @@
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-screen-single"> ScreenGrid
               </label>
+              <div class="NomFiltre">Taille des cellules (px) :</div>
+              <div class="slider-wrapper">
+                <input type="range"
+                      id="cell-slider-single"     
+                      min="10" max="50" step="1" value="20"
+                      class="level">
+                <span id="cell-value-single">20</span>
+              </div>
             </div>
           </div>
           <!-- Agrégations dans les bâtiments -->
@@ -221,12 +229,7 @@
             </div>
 
           </details>
-        </div>
-
-
-        
-
-        
+        </div>           
 
       </div>
 
@@ -247,6 +250,14 @@
       <div class="panel">
         <div id="controls-left" class="layer-controls">
 
+      <!-- SIDEBAR BUTTONS -->
+      <div id="sidebar-buttons-left">
+        <button class="sidebar-btn" data-target="layers-panel-left"     title="Couches"></button>
+        <button class="sidebar-btn" data-target="transports-panel-left" title="Transports"></button>
+        <button class="sidebar-btn" data-target="temporal-panel-left"   title="Temporalité"></button>
+      </div>
+
+      <div id="layers-panel-left" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
           <details class="layer-group">
             <summary>Couche brut</summary>
@@ -270,6 +281,14 @@
             <label class="label">
               <input type="radio" name="layer-left" id="radio-screen-left"> ScreenGrid
             </label>
+            <div class="NomFiltre">Taille des cellules (px) :</div>
+            <div class="slider-wrapper">
+              <input type="range"
+                    id="cell-slider-left"      
+                    min="10" max="50" step="1" value="20"
+                    class="level">
+              <span id="cell-value-left">20</span>
+            </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
@@ -287,7 +306,10 @@
             </div>
           </details>
 
+        </div>
+
           <!-- Filtres de transport -->
+          <div id="transports-panel-left" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres de transport</summary>
             <label class="label"><input type="checkbox" id="filter-aerien-left"   checked> Aérien</label>
@@ -297,8 +319,11 @@
             <label class="label"><input type="checkbox" id="filter-mobilite-left" checked> Mobilité douce</label>
             <label class="label"><input type="checkbox" id="filter-voiture-left"  checked> Voiture</label>
           </details>
+        </div>
 
+        
           <!-- Nouveaux filtres temporels -->
+          <div id="temporal-panel-left" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres temporels</summary>
 
@@ -364,6 +389,9 @@
             </div>
 
           </details>
+          </div>
+
+          
 
         </div>
         <div id="canvas-left" class="deck-canvas"></div>
@@ -377,6 +405,15 @@
       <div class="panel">
         <div id="controls-right" class="layer-controls">
 
+           <!-- ① Boutons latéraux -->
+        <div id="sidebar-buttons-right">
+          <button class="sidebar-btn" data-target="layers-panel-right"     title="Couches"></button>
+          <button class="sidebar-btn" data-target="transports-panel-right" title="Transports"></button>
+          <button class="sidebar-btn" data-target="temporal-panel-right"   title="Temporalité"></button>
+        </div>
+
+         <!-- ② PANNEAU COUCHES -->
+         <div id="layers-panel-right" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
           <details class="layer-group">
             <summary>Couche brut</summary>
@@ -400,6 +437,14 @@
             <label class="label">
               <input type="radio" name="layer-right" id="radio-screen-right"> ScreenGrid
             </label>
+            <div class="NomFiltre">Taille des cellules (px) :</div>
+            <div class="slider-wrapper">
+              <input type="range"
+                    id="cell-slider-right"     
+                    min="10" max="50" step="1" value="20"
+                    class="level">
+              <span id="cell-value-right">20</span>
+            </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
@@ -416,8 +461,10 @@
               </div>
             </div>
           </details>
+        </div>
 
           <!-- Filtres de transport -->
+          <div id="transports-panel-right" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres de transport</summary>
             <label class="label"><input type="checkbox" id="filter-aerien-right"   checked> Aérien</label>
@@ -427,8 +474,10 @@
             <label class="label"><input type="checkbox" id="filter-mobilite-right" checked> Mobilité douce</label>
             <label class="label"><input type="checkbox" id="filter-voiture-right"  checked> Voiture</label>
           </details>
+          </div>
 
           <!-- Nouveaux filtres temporels -->
+          <div id="temporal-panel-right" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres temporels</summary>
 
@@ -494,6 +543,7 @@
             </div>
 
           </details>
+        </div>
 
         </div>
         <div id="canvas-right" class="deck-canvas"></div>

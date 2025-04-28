@@ -58,8 +58,9 @@ const defaultState = {
     hours: [0, 23],
     daysOfMonth: [1, 31]     
   },
-  layerType: 'grid',
-  sliderValue: 1000
+  layerType: 'scatter',
+  sliderValue: 1000,
+  cellSize: 20
 };
 
 // Load geojson and initialize
@@ -134,7 +135,8 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
 
     },
     layerType:    initialState.layerType,
-    sliderValue:  initialState.sliderValue
+    sliderValue:  initialState.sliderValue,
+    cellSize:    initialState.cellSize
   };
 
 
@@ -236,6 +238,16 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
       const radiusSlider = document.getElementById('radius-slider');
       const thresholdValueEl = document.getElementById('threshold-value');
       const radiusValueEl = document.getElementById('radius-value');
+      const cellSlider  = document.getElementById(`cell-slider-${controlsPrefix}`);
+      const cellValueEl = document.getElementById(`cell-value-${controlsPrefix}`);
+
+      if (cellSlider) {
+        cellSlider.addEventListener('input', e => {
+          state.cellSize         = +e.target.value;   // valeur stockée dans l’état de la vue
+          cellValueEl.textContent = state.cellSize;   // maj de l’affichage “20”, “21”, …
+          updateView();                               // re-rendu immédiat
+        });
+      }
 
       if (thresholdSlider) {
         thresholdSlider.addEventListener('input', e => {
@@ -252,6 +264,8 @@ function createInstance({ container, controlsPrefix, donutId, initialState, geo 
       updateView(); // recharge la carte
     });
   }
+
+ 
 
       const mapSelect = document.getElementById('map-style-select');
 
@@ -499,7 +513,7 @@ document.getElementById(`reset-temporal-filters-${controlsPrefix}`)
   
     // Ajoute la couche des quartiers en plus de la couche principale
     deckgl.setProps({ layers: [
-      buildLayer(state.layerType, pts, state.sliderValue),
+      buildLayer(state.layerType, pts, state.sliderValue,state.cellSize),
       quartiersLayer
     ]});
   
@@ -526,7 +540,7 @@ document.getElementById(`reset-temporal-filters-${controlsPrefix}`)
 
 
 /** Build DeckGL layer **/
-function buildLayer(type, data, slider) {
+function buildLayer(type, data, slider, cellSize = 20) {
   switch(type){
     case 'scatter': return new ScatterplotLayer({
       id: 'ScatterplotLayer',
@@ -573,7 +587,7 @@ function buildLayer(type, data, slider) {
     case 'screen':  return new ScreenGridLayer({ 
       id:'ScreenGridLayer', 
       data, 
-      cellSizePixels:20, 
+      cellSizePixels:cellSize, 
       opacity:0.8, 
       getPosition:d=>[d.lon,d.lat], 
       colorRange:[[1,152,189],[73,227,206],[216,254,181],[254,237,177],[254,173,84],[209,55,78]] });
@@ -733,12 +747,14 @@ document.getElementById('btn-export-pdf').addEventListener('click', async () => 
 });
 
 
-// Gestion des boutons latéraux
-document.querySelectorAll('.sidebar-btn').forEach(button => {
-  button.addEventListener('click', () => {
-    const targetId = button.dataset.target;
-    document.querySelectorAll('.sidebar-panel').forEach(panel => {
-      panel.style.display = panel.id === targetId && panel.style.display !== 'block' ? 'block' : 'none';
+// Gestion indépendante des menus latéraux
+document.querySelectorAll('.sidebar-btn').forEach(btn=>{
+  btn.addEventListener('click', () =>{
+    const targetId = btn.dataset.target;                       // ex. layers-panel-left
+    const scope    = btn.closest('.layer-controls');           // on reste dans la vue
+    scope.querySelectorAll('.sidebar-panel').forEach(panel=>{
+      panel.style.display =
+        (panel.id === targetId && panel.style.display!=='block') ? 'block' : 'none';
     });
   });
 });

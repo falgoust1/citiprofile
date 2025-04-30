@@ -182,6 +182,27 @@ body, html {
   margin-right: 20px;
 }
 
+/* Conteneur global des contrôles MapLibre (pour gérer l’opacité) */
+.maplibregl-ctrl {
+  opacity: 0.8;
+}
+
+/* Style de la barre d’échelle */
+.maplibregl-ctrl-scale {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #1C4568;
+}
+
+/* Décalage sous le header (ajustez 80px à la hauteur réelle) */
+.maplibregl-ctrl-bottom-left {
+  bottom: 8px !important; /* si besoin de décaler verticalement */
+  left: 8px !important;   /* marge par rapport au coin */
+}
+
+
 
 /* SINGLE VIEW & SPLIT VIEW CONTAINERS */
 #single-view,

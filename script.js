@@ -64,7 +64,7 @@ const defaultState = {
 };
 
 // Load geojson and initialize
-fetch("1milion_ok.geojson")
+fetch("1million.geojson")
   .then(res => res.json())
   .then(geojson => {
 
@@ -214,35 +214,51 @@ const chart = new Chart(ctx, {
   /*––– DeckGL –––*/
   const deckgl = new DeckGL({
     container,
-    mapStyle:"https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
-    controller:true,
+    mapLib: maplibregl,
+    mapStyle: "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
+    controller: true,
     viewState: state.viewState,
     getTooltip: ({object}) => makeTooltip(object),
-    onViewStateChange: ({viewState})=>{
+    onViewStateChange: ({viewState}) => {
       state.viewState = viewState;
-       // Ajout : si on a un quartier sélectionné ET qu'on dézoome sous le seuil, on réinitialise le filtre spatial
-    if (selectedQuartierPolygon && viewState.zoom < 13) {
-      selectedQuartierPolygon = null;
-      updateView(); // recharge les données sans filtre spatial
-      document.querySelector('#quartier-nom').textContent = ''; // supprime le nom du quartier affiché
-    }
-       /* ---- synchronisation miroir ---- */
-    if (isSplit && mirrorEnabled && !syncingView) {
-      const other = container.includes("left") ? "right"
-                  : container.includes("right") ? "left"
-                  : null;
-
-      if (other && instances[other]) {
-        syncingView = true;                  // on inhibe le callback de l’autre carte
-        instances[other].deckgl.setProps({ viewState });
-        instances[other].state.viewState = viewState;
-        syncingView = false;
+      // Réinitialisation du filtre spatial si zoom < 13
+      if (selectedQuartierPolygon && viewState.zoom < 13) {
+        selectedQuartierPolygon = null;
+        updateView();
+        document.querySelector('#quartier-nom').textContent = '';
       }
-    }
-      deckgl.setProps({ viewState });
+      // Synchronisation en mode split
+      if (isSplit && mirrorEnabled && !syncingView) {
+        const other = container.includes("left") ? "right" : "left";
+        if (other && instances[other]) {
+          syncingView = true;
+          instances[other].deckgl.setProps({viewState});
+          instances[other].state.viewState = viewState;
+          syncingView = false;
+        }
+      }
+      deckgl.setProps({viewState});
     },
-    layers:[]
+    layers: []
   });
+  
+  // Récupération de l'instance MapLibre
+  const map = deckgl.getMapboxMap();
+  
+  // Ajout de la barre d'échelle métrique lors du chargement de la carte
+  map.once('load', () => {
+    map.addControl(
+      new maplibregl.ScaleControl({ maxWidth: 100, unit: 'metric' }),
+      'bottom-left'
+    );
+  });
+  
+  // Lancement initial du rendu des couches
+  updateView();
+  
+  
+
+      
 
       attachControlListeners(controlsPrefix, state, updateView);
 
@@ -578,7 +594,7 @@ function buildLayer(type, data, slider, cellSize = 20) {
     case 'scatter': return new ScatterplotLayer({
       id: 'ScatterplotLayer',
       data,
-      radiusMinPixels: 1.4,
+      radiusMinPixels: 1.6,
       radiusMaxPixels: 50,
       getRadius: 1,
       radiusUnits: 'pixels',

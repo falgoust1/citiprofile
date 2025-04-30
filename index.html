@@ -10,9 +10,7 @@
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
 
-  <!-- Mapbox GL (pour compatibilité) -->
-  <script src="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.css" rel="stylesheet" />
+
 
   <!-- Chart.js + datalabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
@@ -86,17 +84,17 @@
 
         <!-- PANELS -->
         <div id="layers-panel" class="sidebar-panel">
-          <div class="ChoixLayer">Choix du Layer</div>
+          <div class="ChoixLayer">Mode de représentation</div>
           <!-- Couche brute -->
           <div class="layer-group">
-            <div class="TypeAgreg">Couche brut</div>
+            <div class="TypeAgreg"><strong>Couche brut</strong></div>
             <label class="label">
               <input type="radio" name="layer-single" id="radio-scatter-single" checked> Scatterplot
             </label>
           </div>
           <!-- Agrégations dans une grille -->
           <div class="layer-group">
-            <div class="TypeAgreg">Agrégations dans une grille</div>
+            <div class="TypeAgreg"><strong>Agrégations dans une grille</strong></div>
             <div class="ligneContainer">
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-grid-single" > GridExtrude
@@ -132,7 +130,7 @@
           </div>
           <!-- Agrégations dans les bâtiments -->
           <div class="layer-group">
-            <div class="TypeAgreg">Agrégations dans les bâtiments</div>
+            <div class="TypeAgreg"><strong>Agrégations dans les bâtiments</strong></div>
             <label class="label">
               <input type="radio" name="layer-single" id="radio-poly-single"> Bâtiments 3D
             </label>
@@ -259,6 +257,7 @@
 
       <div id="layers-panel-left" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
+          <div class="ChoixLayer">Mode de représentation</div>
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
@@ -428,6 +427,7 @@
          <!-- ② PANNEAU COUCHES -->
          <div id="layers-panel-right" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
+          <div class="ChoixLayer">Mode de représentation</div>
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">

@@ -11,9 +11,6 @@ body, html {
 }
 
 
-
-
-
 #container {
   position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
   width: 100%;
@@ -81,12 +78,7 @@ body, html {
   margin-right: 40px;
 }
 
-#header-right svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0; /* évite que les SVG rétrécissent */
-  fill: white;
-}
+
 
 
 
@@ -155,13 +147,13 @@ body, html {
   background-color: #fff;
   margin-left: 42px;
   cursor: pointer;
-  overflow: visible;
+
   font-family: inherit;
   font-size: 100%;
   line-height: 1.15;
   margin: 0px;
   text-align: center;
-  align-items: center;
+
 }
 
 .map-select:hover {
@@ -169,18 +161,27 @@ body, html {
 }
 
 
-#btn-export {
-  background-color: #124E66;
-  color: white;
-  padding: 6px 12px;
-  font-family: Poppins;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-right: 20px;
+
+/* Conteneur global des contrôles MapLibre (pour gérer l’opacité) */
+.maplibregl-ctrl {
+  opacity: 0.8;
 }
+
+/* Style de la barre d’échelle */
+.maplibregl-ctrl-scale {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #1C4568;
+}
+
+/* Décalage sous le header (ajustez 80px à la hauteur réelle) */
+.maplibregl-ctrl-bottom-left {
+  bottom: 8px !important; /* si besoin de décaler verticalement */
+  left: 8px !important;   /* marge par rapport au coin */
+}
+
 
 
 /* SINGLE VIEW & SPLIT VIEW CONTAINERS */
@@ -220,20 +221,9 @@ body, html {
 
 
 
-/* Controls Panels Positioning */
-#layer-controls-single,
-#controls-left {
-  left: auto;
-  right: 24px;
-  top: 24px;
-}
 
-#controls-right {
-  position: absolute;
-  top: 20%;
-  right: 40px;
-  z-index: 1000;
-}
+
+
 
 /* TOOLTIP */
 .deck-tooltip {
@@ -282,6 +272,7 @@ body, html {
   align-items: center;
   gap: 4px;
   width: 60px;
+  
 }
 
 /* espace entre checkbox et texte */
@@ -292,6 +283,7 @@ body, html {
 /* noUiSlider : conteneur du slider */
 .noUi-target {
   margin: 10px 0;
+  
 }
 
 /* rail du slider */
@@ -327,7 +319,7 @@ body, html {
   gap: 12px;
   position: absolute;
   bottom: 20px;
-  left: 400px;
+  left: 200px;
   z-index: 1000;
   width: 520px; /* ou plus selon ton espace disponible */
   height: 220px;
@@ -458,11 +450,11 @@ body.dark-mode .legend-container {
 }
 
 .sidebar-panel {
-  position: relative;
+  position: absolute;
   flex-direction: column;
-  top: 100px;
+  top: 0;
   left: 90px;
-  width: 359px;
+  width: 200px;
   max-height: calc(-115px + 100vh);
   padding-bottom: 26px;
   overflow-y: auto;
@@ -470,7 +462,7 @@ body.dark-mode .legend-container {
   border-radius: 8px;
   padding: 20px;
   z-index: 1200;
-  display: flex;
+  display: none;
   color: white;
 }
 
@@ -562,3 +554,60 @@ body.dark-mode .legend-container {
 .slider-wrapper:hover .level {
   height: calc(var(--slider-height) * 2);
 }
+
+/* Assure que le nouveau slider reste contenu dans son volet */
+#dom-slider-single,
+#dom-slider-left,
+#dom-slider-right {
+  margin: 0 4px;
+}
+
+
+.panel .layer-controls,
+#layer-controls-single{
+  position:absolute;
+  top:100px;
+  left:15px;        
+  z-index:1200;
+}
+
+
+/* même rendu pour single, gauche et droite */
+#sidebar-buttons{
+  position:absolute;
+  top:0;
+  left:15px;
+  background:#fbfcfe;
+  display:flex;
+  flex-direction:column;
+  z-index:1200;
+  border-radius:12px;
+  padding:2px;
+
+}
+
+#sidebar-buttons-right{
+  position:absolute;
+  top:0px;
+  left:0px;
+  background:#fbfcfe;
+  display:flex;
+  flex-direction:column;
+  z-index:1200;
+  border-radius:12px;
+  padding:2px;
+}
+
+#sidebar-buttons-left{
+  position:fixed;
+  top:100px;
+  left:15px;
+  background:#fbfcfe;
+  display:flex;
+  flex-direction:column;
+  z-index:1200;
+  border-radius:12px;
+  padding:2px;
+
+}
+

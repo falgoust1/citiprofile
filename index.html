@@ -10,9 +10,7 @@
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
 
-  <!-- Mapbox GL (pour compatibilité) -->
-  <script src="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.css" rel="stylesheet" />
+
 
   <!-- Chart.js + datalabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
@@ -86,33 +84,33 @@
 
         <!-- PANELS -->
         <div id="layers-panel" class="sidebar-panel">
-          <div class="ChoixLayer">Choix du Layer</div>
+          <div class="ChoixLayer">Mode de représentation</div>
           <!-- Couche brute -->
           <div class="layer-group">
-            <div class="TypeAgreg">Couche brut</div>
+            <div class="TypeAgreg"><strong>Couche brut</strong></div>
             <label class="label">
-              <input type="radio" name="layer-single" id="radio-scatter-single"> Scatterplot
+              <input type="radio" name="layer-single" id="radio-scatter-single" checked> Scatterplot
             </label>
           </div>
           <!-- Agrégations dans une grille -->
           <div class="layer-group">
-            <div class="TypeAgreg">Agrégations dans une grille</div>
+            <div class="TypeAgreg"><strong>Agrégations dans une grille</strong></div>
             <div class="ligneContainer">
               <label class="label">
-                <input type="radio" name="layer-single" id="radio-grid-single" checked> GridExtrude
+                <input type="radio" name="layer-single" id="radio-grid-single" > GridExtrude
               </label>
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-heat-single"> Heatmap
               </label>
                 <div class="NomFiltre">Threshold de la heatmap :</div>
                 <div class="slider-wrapper">
-                  <input type="range" id="threshold-slider" min="0" max="1" step="0.01" value="0.03" class="level">
-                  <span id="threshold-value">0.03</span>
+                  <input type="range" id="threshold-slider-single" min="0" max="1" step="0.01" value="0.03" class="level">
+                  <span id="threshold-value-single">0.03</span>
                 </div>
                 <div class="NomFiltre">Rayon de la heatmap :</div>
                 <div class="slider-wrapper">
-                  <input type="range" id="radius-slider" min="10" max="100" value="30" class="level">
-                  <span id="radius-value">30</span>
+                  <input type="range" id="radius-slider-single" min="10" max="100" value="30" class="level">
+                  <span id="radius-value-single">30</span>
                 </div>
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-hex-single"> Hexbin 3D
@@ -120,11 +118,19 @@
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-screen-single"> ScreenGrid
               </label>
+              <div class="NomFiltre">Taille des cellules (px) :</div>
+              <div class="slider-wrapper">
+                <input type="range"
+                      id="cell-slider-single"     
+                      min="10" max="50" step="1" value="20"
+                      class="level">
+                <span id="cell-value-single">20</span>
+              </div>
             </div>
           </div>
           <!-- Agrégations dans les bâtiments -->
           <div class="layer-group">
-            <div class="TypeAgreg">Agrégations dans les bâtiments</div>
+            <div class="TypeAgreg"><strong>Agrégations dans les bâtiments</strong></div>
             <label class="label">
               <input type="radio" name="layer-single" id="radio-poly-single"> Bâtiments 3D
             </label>
@@ -142,12 +148,12 @@
           <!-- Filtres de transport -->
           <details class="layer-group">
             <summary>Filtres de transport</summary>
-            <label class="label">
-              <input type="checkbox" id="filter-pied-single" checked> À pied
-            </label>
-            <label class="label">
-              <input type="checkbox" id="filter-vehicule-single" checked> Véhicule
-            </label>
+            <label class="label"><input type="checkbox" id="filter-aerien-single"   checked> Aérien</label>
+            <label class="label"><input type="checkbox" id="filter-eau-single"      checked> Eau</label>
+            <label class="label"><input type="checkbox" id="filter-inconnu-single"  checked> Inconnu</label>
+            <label class="label"><input type="checkbox" id="filter-pieton-single"   checked> Piéton</label>
+            <label class="label"><input type="checkbox" id="filter-mobilite-single" checked> Mobilité douce</label>
+            <label class="label"><input type="checkbox" id="filter-voiture-single"  checked> Voiture</label>
           </details>
         </div>
 
@@ -192,16 +198,23 @@
             </summary>
             <div class="slider-container">
               <div class="checkbox-group" id="dow-checkboxes-single">
-                <label><input type="checkbox" value="Lu" checked> Lu</label>
-                <label><input type="checkbox" value="Ma" checked> Ma</label>
-                <label><input type="checkbox" value="Me" checked> Me</label>
-                <label><input type="checkbox" value="Je" checked> Je</label>
-                <label><input type="checkbox" value="Ve" checked> Ve</label>
-                <label><input type="checkbox" value="Sa" checked> Sa</label>
-                <label><input type="checkbox" value="Di" checked> Di</label>
+                <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="Ma" checked> Ma</label>
+              <label><input type="checkbox" value="Me" checked> Me</label>
+              <label><input type="checkbox" value="J" checked> Je</label>
+              <label><input type="checkbox" value="V" checked> Ve</label>
+              <label><input type="checkbox" value="S" checked> Sa</label>
+              <label><input type="checkbox" value="D" checked> Di</label>
               </div>
             </div>
           </details>
+
+          <!-- Jours du mois -->
+        <div class="slider-container">
+          <h3>Jours du mois (1 – 31)</h3>
+          <div id="dom-slider-single"></div> <!-- prefix = single | left | right -->
+        </div>
+
 
 
             <!-- Heures -->
@@ -214,12 +227,7 @@
             </div>
 
           </details>
-        </div>
-
-
-        
-
-        
+        </div>           
 
       </div>
 
@@ -240,11 +248,20 @@
       <div class="panel">
         <div id="controls-left" class="layer-controls">
 
+      <!-- SIDEBAR BUTTONS -->
+      <div id="sidebar-buttons-left">
+        <button class="sidebar-btn" data-target="layers-panel-left"     title="Couches"></button>
+        <button class="sidebar-btn" data-target="transports-panel-left" title="Transports"></button>
+        <button class="sidebar-btn" data-target="temporal-panel-left"   title="Temporalité"></button>
+      </div>
+
+      <div id="layers-panel-left" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
+          <div class="ChoixLayer">Mode de représentation</div>
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
-              <input type="radio" name="layer-left" id="radio-scatter-left"> Scatterplot
+              <input type="radio" name="layer-left" id="radio-scatter-left" checked> Scatterplot
             </label>
           </details>
 
@@ -252,17 +269,38 @@
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
-              <input type="radio" name="layer-left" id="radio-grid-left" checked> GridExtrude
+              <input type="radio" name="layer-left" id="radio-grid-left" > GridExtrude
             </label>
             <label class="label">
               <input type="radio" name="layer-left" id="radio-heat-left"> Heatmap
             </label>
+
+              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="threshold-slider-left"  min="0" max="1" step="0.01" value="0.03" class="level">
+                <span id="threshold-value-left">0.03</span>
+              </div>
+
+              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="radius-slider-left"     min="10" max="100" value="30" class="level">
+                <span id="radius-value-left">30</span>
+              </div>
+
             <label class="label">
               <input type="radio" name="layer-left" id="radio-hex-left"> Hexbin 3D
             </label>
             <label class="label">
               <input type="radio" name="layer-left" id="radio-screen-left"> ScreenGrid
             </label>
+            <div class="NomFiltre">Taille des cellules (px) :</div>
+            <div class="slider-wrapper">
+              <input type="range"
+                    id="cell-slider-left"      
+                    min="10" max="50" step="1" value="20"
+                    class="level">
+              <span id="cell-value-left">20</span>
+            </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
@@ -280,18 +318,24 @@
             </div>
           </details>
 
+        </div>
+
           <!-- Filtres de transport -->
+          <div id="transports-panel-left" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres de transport</summary>
-            <label class="label">
-              <input type="checkbox" id="filter-pied-left" checked> À pied
-            </label>
-            <label class="label">
-              <input type="checkbox" id="filter-vehicule-left" checked> Véhicule
-            </label>
+            <label class="label"><input type="checkbox" id="filter-aerien-left"   checked> Aérien</label>
+            <label class="label"><input type="checkbox" id="filter-eau-left"      checked> Eau</label>
+            <label class="label"><input type="checkbox" id="filter-inconnu-left"  checked> Inconnu</label>
+            <label class="label"><input type="checkbox" id="filter-pieton-left"   checked> Piéton</label>
+            <label class="label"><input type="checkbox" id="filter-mobilite-left" checked> Mobilité douce</label>
+            <label class="label"><input type="checkbox" id="filter-voiture-left"  checked> Voiture</label>
           </details>
+        </div>
 
+        
           <!-- Nouveaux filtres temporels -->
+          <div id="temporal-panel-left" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres temporels</summary>
 
@@ -329,16 +373,22 @@
               </summary>
               <div class="slider-container">
                 <div class="checkbox-group" id="dow-checkboxes-left">
-                  <label><input type="checkbox" value="Lu" checked> Lu</label>
-                  <label><input type="checkbox" value="Ma" checked> Ma</label>
-                  <label><input type="checkbox" value="Me" checked> Me</label>
-                  <label><input type="checkbox" value="Je" checked> Je</label>
-                  <label><input type="checkbox" value="Ve" checked> Ve</label>
-                  <label><input type="checkbox" value="Sa" checked> Sa</label>
-                  <label><input type="checkbox" value="Di" checked> Di</label>
+                  <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="Ma" checked> Ma</label>
+              <label><input type="checkbox" value="Me" checked> Me</label>
+              <label><input type="checkbox" value="J" checked> Je</label>
+              <label><input type="checkbox" value="V" checked> Ve</label>
+              <label><input type="checkbox" value="S" checked> Sa</label>
+              <label><input type="checkbox" value="D" checked> Di</label>
                 </div>
               </div>
             </details>
+
+             <!-- Jours du mois -->
+        <div class="slider-container">
+          <h3>Jours du mois (1 – 31)</h3>
+          <div id="dom-slider-left"></div> 
+        </div>
     
 
             <!-- Heures -->
@@ -351,6 +401,9 @@
             </div>
 
           </details>
+          </div>
+
+          
 
         </div>
         <div id="canvas-left" class="deck-canvas"></div>
@@ -364,11 +417,21 @@
       <div class="panel">
         <div id="controls-right" class="layer-controls">
 
+           <!-- ① Boutons latéraux -->
+        <div id="sidebar-buttons-right">
+          <button class="sidebar-btn" data-target="layers-panel-right"     title="Couches"></button>
+          <button class="sidebar-btn" data-target="transports-panel-right" title="Transports"></button>
+          <button class="sidebar-btn" data-target="temporal-panel-right"   title="Temporalité"></button>
+        </div>
+
+         <!-- ② PANNEAU COUCHES -->
+         <div id="layers-panel-right" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
+          <div class="ChoixLayer">Mode de représentation</div>
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
-              <input type="radio" name="layer-right" id="radio-scatter-right"> Scatterplot
+              <input type="radio" name="layer-right" id="radio-scatter-right"checked> Scatterplot
             </label>
           </details>
 
@@ -376,17 +439,39 @@
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
-              <input type="radio" name="layer-right" id="radio-grid-right" checked> GridExtrude
+              <input type="radio" name="layer-right" id="radio-grid-right" > GridExtrude
             </label>
             <label class="label">
               <input type="radio" name="layer-right" id="radio-heat-right"> Heatmap
             </label>
+
+              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="threshold-slider-right"  min="0" max="1" step="0.01" value="0.03" class="level">
+                <span id="threshold-value-right">0.03</span>
+              </div>
+
+              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="radius-slider-right"     min="10" max="100" value="30" class="level">
+                <span id="radius-value-right">30</span>
+              </div>
+
+
             <label class="label">
               <input type="radio" name="layer-right" id="radio-hex-right"> Hexbin 3D
             </label>
             <label class="label">
               <input type="radio" name="layer-right" id="radio-screen-right"> ScreenGrid
             </label>
+            <div class="NomFiltre">Taille des cellules (px) :</div>
+            <div class="slider-wrapper">
+              <input type="range"
+                    id="cell-slider-right"     
+                    min="10" max="50" step="1" value="20"
+                    class="level">
+              <span id="cell-value-right">20</span>
+            </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
@@ -403,19 +488,23 @@
               </div>
             </div>
           </details>
+        </div>
 
           <!-- Filtres de transport -->
+          <div id="transports-panel-right" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres de transport</summary>
-            <label class="label">
-              <input type="checkbox" id="filter-pied-right" checked> À pied
-            </label>
-            <label class="label">
-              <input type="checkbox" id="filter-vehicule-right" checked> Véhicule
-            </label>
+            <label class="label"><input type="checkbox" id="filter-aerien-right"   checked> Aérien</label>
+            <label class="label"><input type="checkbox" id="filter-eau-right"      checked> Eau</label>
+            <label class="label"><input type="checkbox" id="filter-inconnu-right"  checked> Inconnu</label>
+            <label class="label"><input type="checkbox" id="filter-pieton-right"   checked> Piéton</label>
+            <label class="label"><input type="checkbox" id="filter-mobilite-right" checked> Mobilité douce</label>
+            <label class="label"><input type="checkbox" id="filter-voiture-right"  checked> Voiture</label>
           </details>
+          </div>
 
           <!-- Nouveaux filtres temporels -->
+          <div id="temporal-panel-right" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres temporels</summary>
 
@@ -453,17 +542,23 @@
               </summary>
               <div class="slider-container">
                 <div class="checkbox-group" id="dow-checkboxes-right">
-                  <label><input type="checkbox" value="Lu" checked> Lu</label>
-                  <label><input type="checkbox" value="Ma" checked> Ma</label>
-                  <label><input type="checkbox" value="Me" checked> Me</label>
-                  <label><input type="checkbox" value="Je" checked> Je</label>
-                  <label><input type="checkbox" value="Ve" checked> Ve</label>
-                  <label><input type="checkbox" value="Sa" checked> Sa</label>
-                  <label><input type="checkbox" value="Di" checked> Di</label>
+                  <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="Ma" checked> Ma</label>
+              <label><input type="checkbox" value="Me" checked> Me</label>
+              <label><input type="checkbox" value="J" checked> Je</label>
+              <label><input type="checkbox" value="V" checked> Ve</label>
+              <label><input type="checkbox" value="S" checked> Sa</label>
+              <label><input type="checkbox" value="D" checked> Di</label>
                 </div>
               </div>
             </details>
     
+
+                <!-- Jours du mois -->
+              <div class="slider-container">
+                <h3>Jours du mois (1 – 31)</h3>
+                <div id="dom-slider-right"></div> 
+              </div>
 
             <!-- Heures -->
             <div class="slider-container">
@@ -475,6 +570,7 @@
             </div>
 
           </details>
+        </div>
 
         </div>
         <div id="canvas-right" class="deck-canvas"></div>

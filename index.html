@@ -10,26 +10,21 @@
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
 
-
-
   <!-- Chart.js + datalabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
   <!-- noUiSlider (filtres temporels) -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
 
   <!-- export pdf-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-
-
+  <!-- Liaison avec le CSS-->
   <link rel="stylesheet" href="style.css">
+
 </head>
 
 
@@ -60,12 +55,8 @@
       </select>
 
       <!--Boutton export pdf --> 
-
-      <button id="btn-export-pdf" class="btn-export">Exporter PDF</button>
-
-      
-      
-      
+      <button id="btn-export-pdf" class="btn-export">Exporter PDF</button>  
+  
     </div>
   </div>
 
@@ -82,17 +73,19 @@
           <button class="sidebar-btn" data-target="temporal-panel" title="Temporalité"></button>
         </div>
 
-        <!-- PANELS -->
+        <!-- PANELS  -->
         <div id="layers-panel" class="sidebar-panel">
           <div class="ChoixLayer">Mode de représentation</div>
-          <!-- Couche brute -->
+
+          <!-- Menus Couche brute -->
           <div class="layer-group">
             <div class="TypeAgreg"><strong>Couche brut</strong></div>
             <label class="label">
               <input type="radio" name="layer-single" id="radio-scatter-single" checked> Scatterplot
             </label>
           </div>
-          <!-- Agrégations dans une grille -->
+
+        <!-- Menus Agrégations dans une grille -->
           <div class="layer-group">
             <div class="TypeAgreg"><strong>Agrégations dans une grille</strong></div>
             <div class="ligneContainer">
@@ -102,50 +95,52 @@
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-heat-single"> Heatmap
               </label>
-                <div class="NomFiltre">Threshold de la heatmap :</div>
-                <div class="slider-wrapper">
-                  <input type="range" id="threshold-slider-single" min="0" max="1" step="0.01" value="0.03" class="level">
-                  <span id="threshold-value-single">0.03</span>
-                </div>
-                <div class="NomFiltre">Rayon de la heatmap :</div>
-                <div class="slider-wrapper">
-                  <input type="range" id="radius-slider-single" min="10" max="100" value="30" class="level">
-                  <span id="radius-value-single">30</span>
-                </div>
+                  <div class="NomFiltre">Threshold de la heatmap :</div>
+                  <div class="slider-wrapper">
+                    <input type="range" id="threshold-slider-single" min="0" max="1" step="0.01" value="0.03" class="level">
+                    <span id="threshold-value-single">0.03</span>
+                  </div>
+                  <div class="NomFiltre">Rayon de la heatmap :</div>
+                  <div class="slider-wrapper">
+                    <input type="range" id="radius-slider-single" min="10" max="100" value="30" class="level">
+                    <span id="radius-value-single">30</span>
+                  </div>
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-hex-single"> Hexbin 3D
               </label>
               <label class="label">
                 <input type="radio" name="layer-single" id="radio-screen-single"> ScreenGrid
               </label>
-              <div class="NomFiltre">Taille des cellules (px) :</div>
-              <div class="slider-wrapper">
-                <input type="range"
-                      id="cell-slider-single"     
-                      min="10" max="50" step="1" value="20"
-                      class="level">
-                <span id="cell-value-single">20</span>
-              </div>
+                  <div class="NomFiltre">Taille des cellules (px) :</div>
+                  <div class="slider-wrapper">
+                    <input type="range"
+                          id="cell-slider-single"     
+                          min="10" max="50" step="1" value="20"
+                          class="level">
+                    <span id="cell-value-single">20</span>
+                  </div>
             </div>
           </div>
           <!-- Agrégations dans les bâtiments -->
           <div class="layer-group">
             <div class="TypeAgreg"><strong>Agrégations dans les bâtiments</strong></div>
-            <label class="label">
-              <input type="radio" name="layer-single" id="radio-poly-single"> Bâtiments 3D
-            </label>
-            <div class="slider-container">
-              <div class="NomFiltre">Maximum de points par bâtiment :</div>
-              <div class="slider-wrapper">
-                <input type="range" id="point-slider-single" min="0" max="1000" value="1000" class="level">
-                <span id="slider-value-single">1000</span>
-              </div>
+              <label class="label">
+                <input type="radio" name="layer-single" id="radio-poly-single"> Bâtiments 3D
+              </label>
+                  <div class="slider-container">
+                    <div class="NomFiltre">Maximum de points par bâtiment :</div>
+                    <div class="slider-wrapper">
+                      <input type="range" id="point-slider-single" min="0" max="1000" value="1000" class="level">
+                      <span id="slider-value-single">1000</span>
+                    </div>
+                  </div>
             </div>
           </div>
-        </div>
 
+          <!-- Menus des types de transports -->
         <div id="transports-panel" class="sidebar-panel">
           <!-- Filtres de transport -->
+
           <details class="layer-group">
             <summary>Filtres de transport</summary>
             <label class="label"><input type="checkbox" id="filter-aerien-single"   checked> Aérien</label>
@@ -157,36 +152,36 @@
           </details>
         </div>
 
+        <!-- Menus des filtres temporels -->
         <div id="temporal-panel" class="sidebar-panel">
-            <!-- Nouveaux filtres temporels -->
-          <details class="layer-group">
+
+            <details class="layer-group">
             <summary>Filtres temporels</summary>
 
-            <!-- Mois -->
-                      
-          <details class="subfilter">
-              <summary>
-              <span>Mois</span>   
-              <button type="button" class="toggle-btn" 
-                      data-target="month-checkboxes-single">Tout décocher</button>
-              </summary>
-            <div class="slider-container">
-              <div class="checkbox-group" id="month-checkboxes-single">
-                <label><input type="checkbox" value="1"  checked> Jan</label>
-                <label><input type="checkbox" value="2"  checked> Fév</label>
-                <label><input type="checkbox" value="3"  checked> Mar</label>
-                <label><input type="checkbox" value="4"  checked> Avr</label>
-                <label><input type="checkbox" value="5"  checked> Mai</label>
-                <label><input type="checkbox" value="6"  checked> Jun</label>
-                <label><input type="checkbox" value="7"  checked> Jul</label>
-                <label><input type="checkbox" value="8"  checked> Aoû</label>
-                <label><input type="checkbox" value="9"  checked> Sep</label>
-                <label><input type="checkbox" value="10" checked> Oct</label>
-                <label><input type="checkbox" value="11" checked> Nov</label>
-                <label><input type="checkbox" value="12" checked> Déc</label>
+            <!-- Mois -->    
+            <details class="subfilter">
+                <summary>
+                <span>Mois</span>   
+                <button type="button" class="toggle-btn" 
+                        data-target="month-checkboxes-single">Tout décocher</button>
+                </summary>
+              <div class="slider-container">
+                <div class="checkbox-group" id="month-checkboxes-single">
+                  <label><input type="checkbox" value="1"  checked> Jan</label>
+                  <label><input type="checkbox" value="2"  checked> Fév</label>
+                  <label><input type="checkbox" value="3"  checked> Mar</label>
+                  <label><input type="checkbox" value="4"  checked> Avr</label>
+                  <label><input type="checkbox" value="5"  checked> Mai</label>
+                  <label><input type="checkbox" value="6"  checked> Jun</label>
+                  <label><input type="checkbox" value="7"  checked> Jul</label>
+                  <label><input type="checkbox" value="8"  checked> Aoû</label>
+                  <label><input type="checkbox" value="9"  checked> Sep</label>
+                  <label><input type="checkbox" value="10" checked> Oct</label>
+                  <label><input type="checkbox" value="11" checked> Nov</label>
+                  <label><input type="checkbox" value="12" checked> Déc</label>
+                </div>
               </div>
-            </div>
-          </details>
+            </details>
 
 
             <!-- Jours de la semaine -->
@@ -198,7 +193,7 @@
             </summary>
             <div class="slider-container">
               <div class="checkbox-group" id="dow-checkboxes-single">
-                <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="L" checked> Lu</label>
               <label><input type="checkbox" value="Ma" checked> Ma</label>
               <label><input type="checkbox" value="Me" checked> Me</label>
               <label><input type="checkbox" value="J" checked> Je</label>
@@ -212,36 +207,35 @@
           <!-- Jours du mois -->
         <div class="slider-container">
           <h3>Jours du mois (1 – 31)</h3>
-          <div id="dom-slider-single"></div> <!-- prefix = single | left | right -->
+          <div id="dom-slider-single"></div> 
         </div>
 
 
 
-            <!-- Heures -->
-            <div class="slider-container">
-              <h3>Heures (0–23)</h3>
-              <div id="hour-slider-single"></div>
-              <div style="text-align:right; margin-top:4px;">
-                <button id="reset-temporal-filters-single">Réinitialiser</button>
-              </div>
+          <!-- Heures -->
+          <div class="slider-container">
+            <h3>Heures (0–23)</h3>
+            <div id="hour-slider-single"></div>
+            <div style="text-align:right; margin-top:4px;">
+              <button id="reset-temporal-filters-single">Réinitialiser</button>
             </div>
-
-          </details>
-        </div>           
-
+          </div>
+        </details>
+      </div>           
       </div>
 
 
+        <!-- Appel des deux Graphiques -->
 
-
-      <div id="deck-canvas-single" class="deck-canvas"></div>
-      <div id="chart-panel-single" class="chart-panel">
-        <canvas id="donut-single"></canvas>
-        <canvas id="single-hour-histogram"></canvas>
+        <div id="deck-canvas-single" class="deck-canvas"></div>
+        <div id="chart-panel-single" class="chart-panel">
+          <canvas id="donut-single"></canvas>
+          <canvas id="single-hour-histogram"></canvas>
+        </div>
       </div>
-    </div>
 
-    <!-- SPLIT VIEW -->
+
+    <!-- SPLIT VIEW (Même chose que dans la single vue adapté aux vues Left/Right) -->
     <div id="split-view" class="split-view" style="display:none">
 
       <!-- Left Panel -->
@@ -256,7 +250,8 @@
       </div>
 
       <div id="layers-panel-left" class="sidebar-panel" style="display:none">
-          <!-- Couche brute -->
+          
+        <!-- Couche brute -->
           <div class="ChoixLayer">Mode de représentation</div>
           <details class="layer-group">
             <summary>Couche brut</summary>
@@ -268,56 +263,61 @@
           <!-- Agrégations dans une grille -->
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
-            <label class="label">
-              <input type="radio" name="layer-left" id="radio-grid-left" > GridExtrude
-            </label>
-            <label class="label">
-              <input type="radio" name="layer-left" id="radio-heat-left"> Heatmap
-            </label>
 
-              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
-              <div class="slider-wrapper">
-                <input type="range" id="threshold-slider-left"  min="0" max="1" step="0.01" value="0.03" class="level">
-                <span id="threshold-value-left">0.03</span>
-              </div>
+              <label class="label">
+                <input type="radio" name="layer-left" id="radio-grid-left" > GridExtrude
+              </label>
 
-              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
-              <div class="slider-wrapper">
-                <input type="range" id="radius-slider-left"     min="10" max="100" value="30" class="level">
-                <span id="radius-value-left">30</span>
-              </div>
+              <label class="label">
+                <input type="radio" name="layer-left" id="radio-heat-left"> Heatmap
+              </label>
 
-            <label class="label">
-              <input type="radio" name="layer-left" id="radio-hex-left"> Hexbin 3D
-            </label>
-            <label class="label">
-              <input type="radio" name="layer-left" id="radio-screen-left"> ScreenGrid
-            </label>
-            <div class="NomFiltre">Taille des cellules (px) :</div>
-            <div class="slider-wrapper">
-              <input type="range"
-                    id="cell-slider-left"      
-                    min="10" max="50" step="1" value="20"
-                    class="level">
-              <span id="cell-value-left">20</span>
-            </div>
+                  <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+                  <div class="slider-wrapper">
+                    <input type="range" id="threshold-slider-left"  min="0" max="1" step="0.01" value="0.03" class="level">
+                    <span id="threshold-value-left">0.03</span>
+                  </div>
+
+                  <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+                  <div class="slider-wrapper">
+                    <input type="range" id="radius-slider-left"     min="10" max="100" value="30" class="level">
+                    <span id="radius-value-left">30</span>
+                  </div>
+
+              <label class="label">
+                <input type="radio" name="layer-left" id="radio-hex-left"> Hexbin 3D
+              </label>
+
+              <label class="label">
+                <input type="radio" name="layer-left" id="radio-screen-left"> ScreenGrid
+              </label>
+
+                  <div class="NomFiltre">Taille des cellules (px) :</div>
+                  <div class="slider-wrapper">
+                    <input type="range"
+                          id="cell-slider-left"      
+                          min="10" max="50" step="1" value="20"
+                          class="level">
+                    <span id="cell-value-left">20</span>
+                  </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
           <details class="layer-group">
             <summary>Agrégations dans les bâtiments</summary>
+
             <label class="label">
               <input type="radio" name="layer-left" id="radio-poly-left"> Bâtiments 3D
             </label>
-            <div class="slider-container">
-              <h3>Maximum de points par bâtiment :</h3>
-              <div class="slider-wrapper">
-                <input type="range" id="point-slider-left" min="0" max="1000" value="1000">
-                <span id="slider-value-left">1000</span>
-              </div>
-            </div>
-          </details>
 
+                <div class="slider-container">
+                  <h3>Maximum de points par bâtiment :</h3>
+                  <div class="slider-wrapper">
+                    <input type="range" id="point-slider-left" min="0" max="1000" value="1000">
+                    <span id="slider-value-left">1000</span>
+                  </div>
+                </div>
+          </details>
         </div>
 
           <!-- Filtres de transport -->
@@ -334,7 +334,7 @@
         </div>
 
         
-          <!-- Nouveaux filtres temporels -->
+          <!-- Menus des filtres temporels -->
           <div id="temporal-panel-left" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres temporels</summary>
@@ -373,7 +373,7 @@
               </summary>
               <div class="slider-container">
                 <div class="checkbox-group" id="dow-checkboxes-left">
-                  <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="L" checked> Lu</label>
               <label><input type="checkbox" value="Ma" checked> Ma</label>
               <label><input type="checkbox" value="Me" checked> Me</label>
               <label><input type="checkbox" value="J" checked> Je</label>
@@ -399,12 +399,11 @@
                 <button id="reset-temporal-filters-left">Réinitialiser</button>
               </div>
             </div>
-
           </details>
           </div>
 
           
-
+          <!-- Graphiques -->
         </div>
         <div id="canvas-left" class="deck-canvas"></div>
         <div id="chart-panel-left" class="chart-panel">
@@ -413,18 +412,20 @@
         </div>
       </div>
 
-      <!-- Right Panel -->
+
+  <!-- Right Panel (vue de droite)-->
+
       <div class="panel">
         <div id="controls-right" class="layer-controls">
 
-           <!-- ① Boutons latéraux -->
+           <!--  Boutons latéraux -->
         <div id="sidebar-buttons-right">
           <button class="sidebar-btn" data-target="layers-panel-right"     title="Couches"></button>
           <button class="sidebar-btn" data-target="transports-panel-right" title="Transports"></button>
           <button class="sidebar-btn" data-target="temporal-panel-right"   title="Temporalité"></button>
         </div>
 
-         <!-- ② PANNEAU COUCHES -->
+         <!--  PANNEAU COUCHES -->
          <div id="layers-panel-right" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
           <div class="ChoixLayer">Mode de représentation</div>
@@ -438,55 +439,61 @@
           <!-- Agrégations dans une grille -->
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
-            <label class="label">
-              <input type="radio" name="layer-right" id="radio-grid-right" > GridExtrude
-            </label>
-            <label class="label">
-              <input type="radio" name="layer-right" id="radio-heat-right"> Heatmap
-            </label>
 
-              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
-              <div class="slider-wrapper">
-                <input type="range" id="threshold-slider-right"  min="0" max="1" step="0.01" value="0.03" class="level">
-                <span id="threshold-value-right">0.03</span>
-              </div>
+              <label class="label">
+                <input type="radio" name="layer-right" id="radio-grid-right" > GridExtrude
+              </label>
 
-              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
-              <div class="slider-wrapper">
-                <input type="range" id="radius-slider-right"     min="10" max="100" value="30" class="level">
-                <span id="radius-value-right">30</span>
-              </div>
+              <label class="label">
+                <input type="radio" name="layer-right" id="radio-heat-right"> Heatmap
+              </label>
 
+                    <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+                    <div class="slider-wrapper">
+                      <input type="range" id="threshold-slider-right"  min="0" max="1" step="0.01" value="0.03" class="level">
+                      <span id="threshold-value-right">0.03</span>
+                    </div>
 
-            <label class="label">
-              <input type="radio" name="layer-right" id="radio-hex-right"> Hexbin 3D
-            </label>
-            <label class="label">
-              <input type="radio" name="layer-right" id="radio-screen-right"> ScreenGrid
-            </label>
-            <div class="NomFiltre">Taille des cellules (px) :</div>
-            <div class="slider-wrapper">
-              <input type="range"
-                    id="cell-slider-right"     
-                    min="10" max="50" step="1" value="20"
-                    class="level">
-              <span id="cell-value-right">20</span>
-            </div>
+                    <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+                    <div class="slider-wrapper">
+                      <input type="range" id="radius-slider-right"     min="10" max="100" value="30" class="level">
+                      <span id="radius-value-right">30</span>
+                    </div>
+
+              <label class="label">
+                <input type="radio" name="layer-right" id="radio-hex-right"> Hexbin 3D
+              </label>
+
+              <label class="label">
+                <input type="radio" name="layer-right" id="radio-screen-right"> ScreenGrid
+              </label>
+
+                  <div class="NomFiltre">Taille des cellules (px) :</div>
+                  <div class="slider-wrapper">
+                    <input type="range"
+                          id="cell-slider-right"     
+                          min="10" max="50" step="1" value="20"
+                          class="level">
+                    <span id="cell-value-right">20</span>
+                  </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
           <details class="layer-group">
             <summary>Agrégation dans les bâtiments</summary>
+
             <label class="label">
               <input type="radio" name="layer-right" id="radio-poly-right"> Bâtiments 3D
             </label>
-            <div class="slider-container">
-              <h3>Maximum de points par bâtiment :</h3>
-              <div class="slider-wrapper">
-                <input type="range" id="point-slider-right" min="0" max="1000" value="1000">
-                <span id="slider-value-right">1000</span>
-              </div>
-            </div>
+
+                <div class="slider-container">
+                  <h3>Maximum de points par bâtiment :</h3>
+                  <div class="slider-wrapper">
+                    <input type="range" id="point-slider-right" min="0" max="1000" value="1000">
+                    <span id="slider-value-right">1000</span>
+                  </div>
+                </div>
+
           </details>
         </div>
 
@@ -542,7 +549,7 @@
               </summary>
               <div class="slider-container">
                 <div class="checkbox-group" id="dow-checkboxes-right">
-                  <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="L" checked> Lu</label>
               <label><input type="checkbox" value="Ma" checked> Ma</label>
               <label><input type="checkbox" value="Me" checked> Me</label>
               <label><input type="checkbox" value="J" checked> Je</label>
@@ -560,7 +567,7 @@
                 <div id="dom-slider-right"></div> 
               </div>
 
-            <!-- Heures -->
+            <!-- Heures --> 
             <div class="slider-container">
               <h3>Heures (0–23)</h3>
               <div id="hour-slider-right"></div>
@@ -571,8 +578,9 @@
 
           </details>
         </div>
-
-        </div>
+          </div>
+         
+        <!-- Graphiques--> 
         <div id="canvas-right" class="deck-canvas"></div>
         <div id="chart-panel-right" class="chart-panel">
           <canvas id="donut-right"></canvas>
@@ -583,14 +591,15 @@
     </div>
   </div>
 
-
+      <!-- Légende--> 
   <div class="legend-container" id="legend-block" style="display: none;">
     <span class="legend-label">Faible nombre de points</span>
     <div class="legend-gradient"></div>
     <span class="legend-label">Nombre important de points</span>
   </div>
   
-
+<!-- Liaison vers le JS--> 
+ 
   <script src="script.js"></script>
 </body>
 </html>

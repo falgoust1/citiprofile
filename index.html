@@ -10,9 +10,7 @@
   <script src="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@^4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
 
-  <!-- Mapbox GL (pour compatibilité) -->
-  <script src="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.css" rel="stylesheet" />
+
 
   <!-- Chart.js + datalabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
@@ -25,8 +23,16 @@
   />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
 
+  <!-- export pdf-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+
   <link rel="stylesheet" href="style.css">
 </head>
+
+
 <body>
 
   <!-- HEADER -->
@@ -43,15 +49,23 @@
     </div>
     <div id="header-right">
       <button id="btn-sync" style="display:none;">Miroir : off</button>
-      <!--Logo soleil --> 
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="0.336"><g id="SVGRepo_bgCarrier"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g clip-path="url(#a)" fill="#ffffff"> <path d="M12 0a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM0 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H1a1 1 0 0 1-1-1ZM21 11a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2h-2ZM13 21a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2ZM6.343 17.657a1 1 0 0 1 0 1.414L4.93 20.485a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0ZM20.485 3.515a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0ZM3.515 3.515a1 1 0 0 1 1.414 0l1.414 1.414A1 1 0 1 1 4.93 6.343L3.515 4.93a1 1 0 0 1 0-1.414ZM17.657 17.657a1 1 0 0 1 1.414 0l1.414 1.414a1 1 0 1 1-1.414 1.414l-1.414-1.414a1 1 0 0 1 0-1.414ZM5 12a7 7 0 1 1 14 0 7 7 0 0 1-14 0Z"></path> </g> <defs> <clipPath id="a"> <path fill="#ffffff" d="M0 0h24v24H0z"></path> </clipPath> </defs> </g></svg>    
-      <!--Switch --> 
-      <label class="toggle-switch">
-        <input type="checkbox" id="map-toggle">
-        <span class="slider"></span>
-      </label>
-      <!--Logo lune --> 
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M21.5287 15.9294C21.3687 15.6594 20.9187 15.2394 19.7987 15.4394C19.1787 15.5494 18.5487 15.5994 17.9187 15.5694C15.5887 15.4694 13.4787 14.3994 12.0087 12.7494C10.7087 11.2994 9.90873 9.40938 9.89873 7.36938C9.89873 6.22938 10.1187 5.12938 10.5687 4.08938C11.0087 3.07938 10.6987 2.54938 10.4787 2.32938C10.2487 2.09938 9.70873 1.77938 8.64873 2.21938C4.55873 3.93938 2.02873 8.03938 2.32873 12.4294C2.62873 16.5594 5.52873 20.0894 9.36873 21.4194C10.2887 21.7394 11.2587 21.9294 12.2587 21.9694C12.4187 21.9794 12.5787 21.9894 12.7387 21.9894C16.0887 21.9894 19.2287 20.4094 21.2087 17.7194C21.8787 16.7894 21.6987 16.1994 21.5287 15.9294Z" fill="#ffffff"></path> </g></svg>
+     
+      
+      <!--Gestion fond de carte --> 
+      
+      <select id="map-style-select" class="map-select">
+        <option value="positron">Fond clair</option>
+        <option value="dark">Fond sombre</option>
+        <option value="satellite">Satellite</option>
+      </select>
+
+      <!--Boutton export pdf --> 
+
+      <button id="btn-export-pdf" class="btn-export">Exporter PDF</button>
+
+      
+      
+      
     </div>
   </div>
 
@@ -61,122 +75,165 @@
     <!-- SINGLE VIEW -->
     <div id="single-view">
       <div id="layer-controls-single" class="layer-controls">
+        <!-- SIDEBAR BUTTONS -->
+        <div id="sidebar-buttons">
+          <button class="sidebar-btn" data-target="layers-panel" title="Couches"></button>
+          <button class="sidebar-btn" data-target="transports-panel" title="Transports"></button>
+          <button class="sidebar-btn" data-target="temporal-panel" title="Temporalité"></button>
+        </div>
 
-        <!-- Couche brute -->
-        <details class="layer-group">
-          <summary>Couche brut</summary>
-          <label class="label">
-            <input type="radio" name="layer-single" id="radio-scatter-single"> Scatterplot
-          </label>
-        </details>
-
-        <!-- Agrégations dans une grille -->
-        <details class="layer-group">
-          <summary>Agrégations dans une grille</summary>
-          <label class="label">
-            <input type="radio" name="layer-single" id="radio-grid-single" checked> GridExtrude
-          </label>
-          <label class="label">
-            <input type="radio" name="layer-single" id="radio-heat-single"> Heatmap
-          </label>
-          <label class="label">
-            <input type="radio" name="layer-single" id="radio-hex-single"> Hexbin 3D
-          </label>
-          <label class="label">
-            <input type="radio" name="layer-single" id="radio-screen-single"> ScreenGrid
-          </label>
-        </details>
-
-        <!-- Agrégations dans les bâtiments -->
-        <details class="layer-group">
-          <summary>Agrégations dans les bâtiments</summary>
-          <label class="label">
-            <input type="radio" name="layer-single" id="radio-poly-single"> Bâtiments 3D
-          </label>
-          <div class="slider-container">
-            <h3>Maximum de points par bâtiment :</h3>
-            <div class="slider-wrapper">
-              <input type="range" id="point-slider-single" min="0" max="1000" value="1000">
-              <span id="slider-value-single">1000</span>
+        <!-- PANELS -->
+        <div id="layers-panel" class="sidebar-panel">
+          <div class="ChoixLayer">Mode de représentation</div>
+          <!-- Couche brute -->
+          <div class="layer-group">
+            <div class="TypeAgreg"><strong>Couche brut</strong></div>
+            <label class="label">
+              <input type="radio" name="layer-single" id="radio-scatter-single" checked> Scatterplot
+            </label>
+          </div>
+          <!-- Agrégations dans une grille -->
+          <div class="layer-group">
+            <div class="TypeAgreg"><strong>Agrégations dans une grille</strong></div>
+            <div class="ligneContainer">
+              <label class="label">
+                <input type="radio" name="layer-single" id="radio-grid-single" > GridExtrude
+              </label>
+              <label class="label">
+                <input type="radio" name="layer-single" id="radio-heat-single"> Heatmap
+              </label>
+                <div class="NomFiltre">Threshold de la heatmap :</div>
+                <div class="slider-wrapper">
+                  <input type="range" id="threshold-slider-single" min="0" max="1" step="0.01" value="0.03" class="level">
+                  <span id="threshold-value-single">0.03</span>
+                </div>
+                <div class="NomFiltre">Rayon de la heatmap :</div>
+                <div class="slider-wrapper">
+                  <input type="range" id="radius-slider-single" min="10" max="100" value="30" class="level">
+                  <span id="radius-value-single">30</span>
+                </div>
+              <label class="label">
+                <input type="radio" name="layer-single" id="radio-hex-single"> Hexbin 3D
+              </label>
+              <label class="label">
+                <input type="radio" name="layer-single" id="radio-screen-single"> ScreenGrid
+              </label>
+              <div class="NomFiltre">Taille des cellules (px) :</div>
+              <div class="slider-wrapper">
+                <input type="range"
+                      id="cell-slider-single"     
+                      min="10" max="50" step="1" value="20"
+                      class="level">
+                <span id="cell-value-single">20</span>
+              </div>
             </div>
           </div>
-        </details>
+          <!-- Agrégations dans les bâtiments -->
+          <div class="layer-group">
+            <div class="TypeAgreg"><strong>Agrégations dans les bâtiments</strong></div>
+            <label class="label">
+              <input type="radio" name="layer-single" id="radio-poly-single"> Bâtiments 3D
+            </label>
+            <div class="slider-container">
+              <div class="NomFiltre">Maximum de points par bâtiment :</div>
+              <div class="slider-wrapper">
+                <input type="range" id="point-slider-single" min="0" max="1000" value="1000" class="level">
+                <span id="slider-value-single">1000</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <!-- Filtres de transport -->
-        <details class="layer-group">
-          <summary>Filtres de transport</summary>
-          <label class="label">
-            <input type="checkbox" id="filter-pied-single" checked> À pied
-          </label>
-          <label class="label">
-            <input type="checkbox" id="filter-vehicule-single" checked> Véhicule
-          </label>
-        </details>
+        <div id="transports-panel" class="sidebar-panel">
+          <!-- Filtres de transport -->
+          <details class="layer-group">
+            <summary>Filtres de transport</summary>
+            <label class="label"><input type="checkbox" id="filter-aerien-single"   checked> Aérien</label>
+            <label class="label"><input type="checkbox" id="filter-eau-single"      checked> Eau</label>
+            <label class="label"><input type="checkbox" id="filter-inconnu-single"  checked> Inconnu</label>
+            <label class="label"><input type="checkbox" id="filter-pieton-single"   checked> Piéton</label>
+            <label class="label"><input type="checkbox" id="filter-mobilite-single" checked> Mobilité douce</label>
+            <label class="label"><input type="checkbox" id="filter-voiture-single"  checked> Voiture</label>
+          </details>
+        </div>
 
-        <!-- Nouveaux filtres temporels -->
-        <details class="layer-group">
-          <summary>Filtres temporels</summary>
+        <div id="temporal-panel" class="sidebar-panel">
+            <!-- Nouveaux filtres temporels -->
+          <details class="layer-group">
+            <summary>Filtres temporels</summary>
 
-          <!-- Mois -->
-                     
-        <details class="subfilter">
+            <!-- Mois -->
+                      
+          <details class="subfilter">
+              <summary>
+              <span>Mois</span>   
+              <button type="button" class="toggle-btn" 
+                      data-target="month-checkboxes-single">Tout décocher</button>
+              </summary>
+            <div class="slider-container">
+              <div class="checkbox-group" id="month-checkboxes-single">
+                <label><input type="checkbox" value="1"  checked> Jan</label>
+                <label><input type="checkbox" value="2"  checked> Fév</label>
+                <label><input type="checkbox" value="3"  checked> Mar</label>
+                <label><input type="checkbox" value="4"  checked> Avr</label>
+                <label><input type="checkbox" value="5"  checked> Mai</label>
+                <label><input type="checkbox" value="6"  checked> Jun</label>
+                <label><input type="checkbox" value="7"  checked> Jul</label>
+                <label><input type="checkbox" value="8"  checked> Aoû</label>
+                <label><input type="checkbox" value="9"  checked> Sep</label>
+                <label><input type="checkbox" value="10" checked> Oct</label>
+                <label><input type="checkbox" value="11" checked> Nov</label>
+                <label><input type="checkbox" value="12" checked> Déc</label>
+              </div>
+            </div>
+          </details>
+
+
+            <!-- Jours de la semaine -->
+          <details class="subfilter">
             <summary>
-            <span>Mois</span>   
-            <button type="button" class="toggle-btn" 
-                    data-target="month-checkboxes-single">Tout décocher</button>
+              <span>Jours</span>  
+              <button type="button"class="toggle-btn"
+                      data-target="dow-checkboxes-single">Tout décocher</button>         
             </summary>
-          <div class="slider-container">
-            <div class="checkbox-group" id="month-checkboxes-single">
-              <label><input type="checkbox" value="1"  checked> Jan</label>
-              <label><input type="checkbox" value="2"  checked> Fév</label>
-              <label><input type="checkbox" value="3"  checked> Mar</label>
-              <label><input type="checkbox" value="4"  checked> Avr</label>
-              <label><input type="checkbox" value="5"  checked> Mai</label>
-              <label><input type="checkbox" value="6"  checked> Jun</label>
-              <label><input type="checkbox" value="7"  checked> Jul</label>
-              <label><input type="checkbox" value="8"  checked> Aoû</label>
-              <label><input type="checkbox" value="9"  checked> Sep</label>
-              <label><input type="checkbox" value="10" checked> Oct</label>
-              <label><input type="checkbox" value="11" checked> Nov</label>
-              <label><input type="checkbox" value="12" checked> Déc</label>
-            </div>
-          </div>
-        </details>
-
-
-          <!-- Jours de la semaine -->
-        <details class="subfilter">
-          <summary>
-            <span>Jours</span>  
-            <button type="button"class="toggle-btn"
-                    data-target="dow-checkboxes-single">Tout décocher</button>         
-          </summary>
-          <div class="slider-container">
-            <div class="checkbox-group" id="dow-checkboxes-single">
-              <label><input type="checkbox" value="Lu" checked> Lu</label>
+            <div class="slider-container">
+              <div class="checkbox-group" id="dow-checkboxes-single">
+                <label><input type="checkbox" value="L" checked> Lu</label>
               <label><input type="checkbox" value="Ma" checked> Ma</label>
               <label><input type="checkbox" value="Me" checked> Me</label>
-              <label><input type="checkbox" value="Je" checked> Je</label>
-              <label><input type="checkbox" value="Ve" checked> Ve</label>
-              <label><input type="checkbox" value="Sa" checked> Sa</label>
-              <label><input type="checkbox" value="Di" checked> Di</label>
+              <label><input type="checkbox" value="J" checked> Je</label>
+              <label><input type="checkbox" value="V" checked> Ve</label>
+              <label><input type="checkbox" value="S" checked> Sa</label>
+              <label><input type="checkbox" value="D" checked> Di</label>
+              </div>
             </div>
-          </div>
-        </details>
+          </details>
+
+          <!-- Jours du mois -->
+        <div class="slider-container">
+          <h3>Jours du mois (1 – 31)</h3>
+          <div id="dom-slider-single"></div> <!-- prefix = single | left | right -->
+        </div>
 
 
-          <!-- Heures -->
-          <div class="slider-container">
-            <h3>Heures (0–23)</h3>
-            <div id="hour-slider-single"></div>
-            <div style="text-align:right; margin-top:4px;">
-              <button id="reset-temporal-filters-single">Réinitialiser</button>
+
+            <!-- Heures -->
+            <div class="slider-container">
+              <h3>Heures (0–23)</h3>
+              <div id="hour-slider-single"></div>
+              <div style="text-align:right; margin-top:4px;">
+                <button id="reset-temporal-filters-single">Réinitialiser</button>
+              </div>
             </div>
-          </div>
 
-        </details>
+          </details>
+        </div>           
 
       </div>
+
+
+
+
       <div id="deck-canvas-single" class="deck-canvas"></div>
       <div id="chart-panel-single" class="chart-panel">
         <canvas id="donut-single"></canvas>
@@ -191,11 +248,20 @@
       <div class="panel">
         <div id="controls-left" class="layer-controls">
 
+      <!-- SIDEBAR BUTTONS -->
+      <div id="sidebar-buttons-left">
+        <button class="sidebar-btn" data-target="layers-panel-left"     title="Couches"></button>
+        <button class="sidebar-btn" data-target="transports-panel-left" title="Transports"></button>
+        <button class="sidebar-btn" data-target="temporal-panel-left"   title="Temporalité"></button>
+      </div>
+
+      <div id="layers-panel-left" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
+          <div class="ChoixLayer">Mode de représentation</div>
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
-              <input type="radio" name="layer-left" id="radio-scatter-left"> Scatterplot
+              <input type="radio" name="layer-left" id="radio-scatter-left" checked> Scatterplot
             </label>
           </details>
 
@@ -203,17 +269,38 @@
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
-              <input type="radio" name="layer-left" id="radio-grid-left" checked> GridExtrude
+              <input type="radio" name="layer-left" id="radio-grid-left" > GridExtrude
             </label>
             <label class="label">
               <input type="radio" name="layer-left" id="radio-heat-left"> Heatmap
             </label>
+
+              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="threshold-slider-left"  min="0" max="1" step="0.01" value="0.03" class="level">
+                <span id="threshold-value-left">0.03</span>
+              </div>
+
+              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="radius-slider-left"     min="10" max="100" value="30" class="level">
+                <span id="radius-value-left">30</span>
+              </div>
+
             <label class="label">
               <input type="radio" name="layer-left" id="radio-hex-left"> Hexbin 3D
             </label>
             <label class="label">
               <input type="radio" name="layer-left" id="radio-screen-left"> ScreenGrid
             </label>
+            <div class="NomFiltre">Taille des cellules (px) :</div>
+            <div class="slider-wrapper">
+              <input type="range"
+                    id="cell-slider-left"      
+                    min="10" max="50" step="1" value="20"
+                    class="level">
+              <span id="cell-value-left">20</span>
+            </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
@@ -231,18 +318,24 @@
             </div>
           </details>
 
+        </div>
+
           <!-- Filtres de transport -->
+          <div id="transports-panel-left" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres de transport</summary>
-            <label class="label">
-              <input type="checkbox" id="filter-pied-left" checked> À pied
-            </label>
-            <label class="label">
-              <input type="checkbox" id="filter-vehicule-left" checked> Véhicule
-            </label>
+            <label class="label"><input type="checkbox" id="filter-aerien-left"   checked> Aérien</label>
+            <label class="label"><input type="checkbox" id="filter-eau-left"      checked> Eau</label>
+            <label class="label"><input type="checkbox" id="filter-inconnu-left"  checked> Inconnu</label>
+            <label class="label"><input type="checkbox" id="filter-pieton-left"   checked> Piéton</label>
+            <label class="label"><input type="checkbox" id="filter-mobilite-left" checked> Mobilité douce</label>
+            <label class="label"><input type="checkbox" id="filter-voiture-left"  checked> Voiture</label>
           </details>
+        </div>
 
+        
           <!-- Nouveaux filtres temporels -->
+          <div id="temporal-panel-left" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres temporels</summary>
 
@@ -280,16 +373,22 @@
               </summary>
               <div class="slider-container">
                 <div class="checkbox-group" id="dow-checkboxes-left">
-                  <label><input type="checkbox" value="Lu" checked> Lu</label>
-                  <label><input type="checkbox" value="Ma" checked> Ma</label>
-                  <label><input type="checkbox" value="Me" checked> Me</label>
-                  <label><input type="checkbox" value="Je" checked> Je</label>
-                  <label><input type="checkbox" value="Ve" checked> Ve</label>
-                  <label><input type="checkbox" value="Sa" checked> Sa</label>
-                  <label><input type="checkbox" value="Di" checked> Di</label>
+                  <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="Ma" checked> Ma</label>
+              <label><input type="checkbox" value="Me" checked> Me</label>
+              <label><input type="checkbox" value="J" checked> Je</label>
+              <label><input type="checkbox" value="V" checked> Ve</label>
+              <label><input type="checkbox" value="S" checked> Sa</label>
+              <label><input type="checkbox" value="D" checked> Di</label>
                 </div>
               </div>
             </details>
+
+             <!-- Jours du mois -->
+        <div class="slider-container">
+          <h3>Jours du mois (1 – 31)</h3>
+          <div id="dom-slider-left"></div> 
+        </div>
     
 
             <!-- Heures -->
@@ -302,6 +401,9 @@
             </div>
 
           </details>
+          </div>
+
+          
 
         </div>
         <div id="canvas-left" class="deck-canvas"></div>
@@ -315,11 +417,21 @@
       <div class="panel">
         <div id="controls-right" class="layer-controls">
 
+           <!-- ① Boutons latéraux -->
+        <div id="sidebar-buttons-right">
+          <button class="sidebar-btn" data-target="layers-panel-right"     title="Couches"></button>
+          <button class="sidebar-btn" data-target="transports-panel-right" title="Transports"></button>
+          <button class="sidebar-btn" data-target="temporal-panel-right"   title="Temporalité"></button>
+        </div>
+
+         <!-- ② PANNEAU COUCHES -->
+         <div id="layers-panel-right" class="sidebar-panel" style="display:none">
           <!-- Couche brute -->
+          <div class="ChoixLayer">Mode de représentation</div>
           <details class="layer-group">
             <summary>Couche brut</summary>
             <label class="label">
-              <input type="radio" name="layer-right" id="radio-scatter-right"> Scatterplot
+              <input type="radio" name="layer-right" id="radio-scatter-right"checked> Scatterplot
             </label>
           </details>
 
@@ -327,17 +439,39 @@
           <details class="layer-group">
             <summary>Agrégations dans une grille</summary>
             <label class="label">
-              <input type="radio" name="layer-right" id="radio-grid-right" checked> GridExtrude
+              <input type="radio" name="layer-right" id="radio-grid-right" > GridExtrude
             </label>
             <label class="label">
               <input type="radio" name="layer-right" id="radio-heat-right"> Heatmap
             </label>
+
+              <div class="NomFiltre">Threshold de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="threshold-slider-right"  min="0" max="1" step="0.01" value="0.03" class="level">
+                <span id="threshold-value-right">0.03</span>
+              </div>
+
+              <div class="NomFiltre">Rayon de la heatmap&nbsp;:</div>
+              <div class="slider-wrapper">
+                <input type="range" id="radius-slider-right"     min="10" max="100" value="30" class="level">
+                <span id="radius-value-right">30</span>
+              </div>
+
+
             <label class="label">
               <input type="radio" name="layer-right" id="radio-hex-right"> Hexbin 3D
             </label>
             <label class="label">
               <input type="radio" name="layer-right" id="radio-screen-right"> ScreenGrid
             </label>
+            <div class="NomFiltre">Taille des cellules (px) :</div>
+            <div class="slider-wrapper">
+              <input type="range"
+                    id="cell-slider-right"     
+                    min="10" max="50" step="1" value="20"
+                    class="level">
+              <span id="cell-value-right">20</span>
+            </div>
           </details>
 
           <!-- Agrégations dans les bâtiments -->
@@ -354,19 +488,23 @@
               </div>
             </div>
           </details>
+        </div>
 
           <!-- Filtres de transport -->
+          <div id="transports-panel-right" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres de transport</summary>
-            <label class="label">
-              <input type="checkbox" id="filter-pied-right" checked> À pied
-            </label>
-            <label class="label">
-              <input type="checkbox" id="filter-vehicule-right" checked> Véhicule
-            </label>
+            <label class="label"><input type="checkbox" id="filter-aerien-right"   checked> Aérien</label>
+            <label class="label"><input type="checkbox" id="filter-eau-right"      checked> Eau</label>
+            <label class="label"><input type="checkbox" id="filter-inconnu-right"  checked> Inconnu</label>
+            <label class="label"><input type="checkbox" id="filter-pieton-right"   checked> Piéton</label>
+            <label class="label"><input type="checkbox" id="filter-mobilite-right" checked> Mobilité douce</label>
+            <label class="label"><input type="checkbox" id="filter-voiture-right"  checked> Voiture</label>
           </details>
+          </div>
 
           <!-- Nouveaux filtres temporels -->
+          <div id="temporal-panel-right" class="sidebar-panel" style="display:none">
           <details class="layer-group">
             <summary>Filtres temporels</summary>
 
@@ -404,17 +542,23 @@
               </summary>
               <div class="slider-container">
                 <div class="checkbox-group" id="dow-checkboxes-right">
-                  <label><input type="checkbox" value="Lu" checked> Lu</label>
-                  <label><input type="checkbox" value="Ma" checked> Ma</label>
-                  <label><input type="checkbox" value="Me" checked> Me</label>
-                  <label><input type="checkbox" value="Je" checked> Je</label>
-                  <label><input type="checkbox" value="Ve" checked> Ve</label>
-                  <label><input type="checkbox" value="Sa" checked> Sa</label>
-                  <label><input type="checkbox" value="Di" checked> Di</label>
+                  <label><input type="checkbox" value="L" checked> Lu</label>
+              <label><input type="checkbox" value="Ma" checked> Ma</label>
+              <label><input type="checkbox" value="Me" checked> Me</label>
+              <label><input type="checkbox" value="J" checked> Je</label>
+              <label><input type="checkbox" value="V" checked> Ve</label>
+              <label><input type="checkbox" value="S" checked> Sa</label>
+              <label><input type="checkbox" value="D" checked> Di</label>
                 </div>
               </div>
             </details>
     
+
+                <!-- Jours du mois -->
+              <div class="slider-container">
+                <h3>Jours du mois (1 – 31)</h3>
+                <div id="dom-slider-right"></div> 
+              </div>
 
             <!-- Heures -->
             <div class="slider-container">
@@ -426,6 +570,7 @@
             </div>
 
           </details>
+        </div>
 
         </div>
         <div id="canvas-right" class="deck-canvas"></div>
@@ -437,6 +582,14 @@
 
     </div>
   </div>
+
+
+  <div class="legend-container" id="legend-block" style="display: none;">
+    <span class="legend-label">Faible nombre de points</span>
+    <div class="legend-gradient"></div>
+    <span class="legend-label">Nombre important de points</span>
+  </div>
+  
 
   <script src="script.js"></script>
 </body>

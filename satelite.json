@@ -1,0 +1,24 @@
+{
+  "version": 8,
+  "name": "Image 2025",
+  "sources": {
+    "icgc-orto": {
+      "type": "raster",
+      "tiles": [
+        "https://www.google.com/maps/vt?lyrs=s@180&gl=cn&x={x}&y={y}&z={z}"
+
+      ],
+      "tileSize": 256,
+      "attribution": "© Google Maps"
+    }
+  },
+  "layers": [
+    {
+      "id": "icgc-orto-layer",
+      "type": "raster",
+      "source": "icgc-orto",
+      "minzoom": 0,
+      "maxzoom": 19
+    }
+  ]
+}

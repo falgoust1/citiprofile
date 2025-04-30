@@ -106,61 +106,88 @@ fetch("1milion_ok.geojson") // Appel réseau pour charger le fichier contenant l
     });
 
     // Gestion du bouton "Exporter PDF"
-document.getElementById('btn-export-pdf').addEventListener('click', async () => {
-  const { jsPDF } = window.jspdf;
+    document.getElementById('btn-export-pdf').addEventListener('click', async () => {
+      const { jsPDF } = window.jspdf;
 
-  if (!instances.single || !instances.single.deckgl) {
-    console.warn("DeckGL non prêt pour export.");
-    return;
-  }
+      if (!instances.single || !instances.single.deckgl) {
+        console.warn("DeckGL non prêt pour export.");
+        return;
+      }
 
-  const mapCanvas = document.querySelector('.maplibregl-canvas') || document.querySelector('.mapboxgl-canvas');
-  const deckCanvas = instances.single.deckgl.canvas;
+      const mapCanvas = document.querySelector('.maplibregl-canvas') || document.querySelector('.mapboxgl-canvas');
+      const deckCanvas = instances.single.deckgl.canvas;
 
-  if (!mapCanvas || !deckCanvas) {
-    console.warn("Canvas Mapbox ou DeckGL introuvable.");
-    return;
-  }
+      if (!mapCanvas || !deckCanvas) {
+        console.warn("Canvas Mapbox ou DeckGL introuvable.");
+        return;
+      }
 
-  const mergedCanvas = document.createElement('canvas');
-  mergedCanvas.width = deckCanvas.width;
-  mergedCanvas.height = deckCanvas.height;
-  const mergedCtx = mergedCanvas.getContext('2d');
-  mergedCtx.drawImage(mapCanvas, 0, 0);
-  mergedCtx.drawImage(deckCanvas, 0, 0);
+      const mergedCanvas = document.createElement('canvas');
+      mergedCanvas.width = deckCanvas.width;
+      mergedCanvas.height = deckCanvas.height;
+      const mergedCtx = mergedCanvas.getContext('2d');
+      mergedCtx.drawImage(mapCanvas, 0, 0);
+      mergedCtx.drawImage(deckCanvas, 0, 0);
 
-  const deckImage = new Image();
-  deckImage.src = mergedCanvas.toDataURL('image/png');
-  await new Promise((resolve, reject) => {
-    deckImage.onload = resolve;
-    deckImage.onerror = reject;
-  });
+      const deckImage = new Image();
+      deckImage.src = mergedCanvas.toDataURL('image/png');
+      await new Promise((resolve, reject) => {
+        deckImage.onload = resolve;
+        deckImage.onerror = reject;
+      });
 
-  const headerCanvas = await html2canvas(document.getElementById('header'));
-  const legendCanvas = await html2canvas(document.getElementById('legend-block'));
-  const chartsCanvas = await html2canvas(document.getElementById('chart-panel-single'));
+      const headerCanvas = await html2canvas(document.getElementById('header'));
+      const legendCanvas = await html2canvas(document.getElementById('legend-block'));
+      const chartsCanvas = await html2canvas(document.getElementById('chart-panel-single'));
 
-  const width = Math.max(mergedCanvas.width, headerCanvas.width, legendCanvas.width, chartsCanvas.width);
-  const totalHeight = headerCanvas.height + mergedCanvas.height + legendCanvas.height + chartsCanvas.height;
+      const width = Math.max(mergedCanvas.width, headerCanvas.width, legendCanvas.width, chartsCanvas.width);
+      const totalHeight = headerCanvas.height + mergedCanvas.height + legendCanvas.height + chartsCanvas.height;
 
-  const finalCanvas = document.createElement('canvas');
-  finalCanvas.width = width;
-  finalCanvas.height = totalHeight;
-  const ctx = finalCanvas.getContext('2d');
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = width;
+      finalCanvas.height = totalHeight;
+      const ctx = finalCanvas.getContext('2d');
 
-  let y = 0;
-  ctx.drawImage(headerCanvas, 0, y); y += headerCanvas.height;
-  ctx.drawImage(deckImage, 0, y); y += deckImage.height;
-  ctx.drawImage(legendCanvas, 0, y); y += legendCanvas.height;
-  ctx.drawImage(chartsCanvas, 0, y);
+      let y = 0;
+      ctx.drawImage(headerCanvas, 0, y); y += headerCanvas.height;
+      ctx.drawImage(deckImage, 0, y); y += deckImage.height;
+      ctx.drawImage(legendCanvas, 0, y); y += legendCanvas.height;
+      ctx.drawImage(chartsCanvas, 0, y);
 
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [width, totalHeight] });
-  const finalImg = finalCanvas.toDataURL('image/png');
-  pdf.addImage(finalImg, 'PNG', 0, 0, width, totalHeight);
-  pdf.save('map.pdf');
-});
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [width, totalHeight] });
+      const finalImg = finalCanvas.toDataURL('image/png');
+      pdf.addImage(finalImg, 'PNG', 0, 0, width, totalHeight);
+      pdf.save('map.pdf');
+    });
     // Affichage ou non de la légende selon la couche active
     toggleLegend(defaultState.layerType);
+
+    // === CHOIX DES URL DE STYLE DE FOND DE CARTE ===
+    const MAP_STYLES = {
+      positron:    "https://openmaptiles.geo.data.gouv.fr/styles/positron/style.json",
+      dark:        "https://openmaptiles.geo.data.gouv.fr/styles/dark-matter/style.json",
+      satellite:   "https://raw.githubusercontent.com/falgoust1/citiprofile/refs/heads/Gurwan/satelite.json"
+    };
+
+    // Listener sur le <select id="map-style-select"> (fond clair / sombre / satellite)
+    const styleSelect = document.getElementById('map-style-select');
+    styleSelect.addEventListener('change', e => {
+      const styleUrl = MAP_STYLES[e.target.value];
+      if (!styleUrl) {
+        console.warn(`Map style inconnu : ${e.target.value}`);
+        return;
+      }
+      // Met à jour la vue unique…
+      if (instances.single) {
+        instances.single.deckgl.setProps({ mapStyle: styleUrl });
+      }
+      // …et les deux vues en split (si actives)
+      ['left', 'right'].forEach(side => {
+        if (instances[side]) {
+          instances[side].deckgl.setProps({ mapStyle: styleUrl });
+        }
+      });
+    });
 
     // Gestion des boutons d’interface (passage split / single / miroir)
     document.getElementById('btn-compare').addEventListener('click', enterSplit);
@@ -695,6 +722,30 @@ function attachControlListeners(prefix, state, onChange) {
     });
   }
 }
+
+// === Gestion des boutons "Tout cocher / Tout décocher" ===
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.dataset.target;
+    const checkboxes = Array.from(document.querySelectorAll(
+      `#${targetId} input[type="checkbox"]`
+    ));
+    
+    // Détecte si *tous* sont cochés
+    const allChecked = checkboxes.every(cb => cb.checked);
+    // On inverse l’état : si tout était coché on décoche, sinon on coche tout
+    const newState = !allChecked;
+
+    checkboxes.forEach(cb => {
+      cb.checked = newState;
+      // ré-émettre l’événement pour mettre à jour le filtre
+      cb.dispatchEvent(new Event('change'));
+    });
+
+    // Adapter le libellé du bouton
+    btn.textContent = newState ? 'Tout décocher' : 'Tout cocher';
+  });
+});
 
 
 //makeTooltip() – Gère le contenu des infobulles au survol

@@ -13,6 +13,7 @@ body, html {
 
 
 
+
 #container {
   position: fixed; /* Utilisation de position absolute pour garantir qu'il occupe tout l'écran */
   width: 100%;
@@ -80,7 +81,12 @@ body, html {
   margin-right: 40px;
 }
 
-
+#header-right svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0; /* évite que les SVG rétrécissent */
+  fill: white;
+}
 
 
 
@@ -149,13 +155,13 @@ body, html {
   background-color: #fff;
   margin-left: 42px;
   cursor: pointer;
-
+  overflow: visible;
   font-family: inherit;
   font-size: 100%;
   line-height: 1.15;
   margin: 0px;
   text-align: center;
-
+  align-items: center;
 }
 
 .map-select:hover {
@@ -163,6 +169,18 @@ body, html {
 }
 
 
+#btn-export {
+  background-color: #124E66;
+  color: white;
+  padding: 6px 12px;
+  font-family: Poppins;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 20px;
+}
 
 /* Conteneur global des contrôles MapLibre (pour gérer l’opacité) */
 .maplibregl-ctrl {
@@ -225,7 +243,12 @@ body, html {
 
 
 
-
+#controls-right {
+    position: absolute;
+    top: 100px;      /* même ancrage vertical que les autres vues */
+    right: 40px;     /* marge intérieure de la moitié droite */
+    z-index: 1200;
+  }
 
 /* TOOLTIP */
 .deck-tooltip {
